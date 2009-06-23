@@ -29,23 +29,42 @@ var pm_Strings = {
     // Chrome has not properties system
 	//BASIC_STRINGS_PROPS_FILE: "popomungo.properties",
 	
+    dict: [
+            "TODO"
+            ],
 
 	getBundleByLanguage: 
 	function getBundleByLanguage(langId, propsFile)
 	{
-		return "TODO";
+		return null;
 	},
 
 
 	InitStringBundle: function InitStringBundle(langId) 
 	{
+        this.dict[pm_StringKeys.LINKS_CHARACTERS_CALL] = "Chiama";
+        this.dict[pm_StringKeys.LINKS_CHARACTERS_CALL_ABBREV] = "C";
+        this.dict[pm_StringKeys.LINKS_CHARACTERS_SEND_MESSAGE] = "Invia messaggio";
+        this.dict[pm_StringKeys.LINKS_CHARACTERS_SEND_MESSAGE_ABBREV] = "M";
+        this.dict[pm_StringKeys.LINKS_LOCALES_MOVE_HERE] = "Sposta qui";
+        this.dict[pm_StringKeys.LINKS_LOCALES_MOVE_HERE_ABBREV] = "G";
+        this.dict[pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS] = "Mostra Personaggi Presenti";
+        this.dict[pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS_ABBREV] = "V";
+        
+        pm_Logger.debug("InitStringBundle finished."); 
+        
         return true;
 	},
 	
 
 	getString: function getString(aStringName, aFormatArgs) 
-	{
-        return "TODO";
+	{    
+        pm_Logger.debug("Requesting String: " + aStringName + " Result = " + this.dict[aStringName]); 
+        
+        if ( this.dict[aStringName] != "" )
+            return this.dict[aStringName];
+        else
+            return "MISS";
 	},
 	
 	
