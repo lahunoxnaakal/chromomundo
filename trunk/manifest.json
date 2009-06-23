@@ -1,6 +1,6 @@
 {
   "name": "Chromomungo",
-  "version": "0.9.1",
+  "version": "0.9.3",
   "description": "The infamous Popomundo ported to Chromium Extension System.",
   "content_scripts": [
     {
@@ -20,6 +20,9 @@
         "core/popoDate.js",
         "core/popoLang.js", 
         "core/userSettings.js",
+        "features/linkMenu.js",
+        "features/links.js",
+        "features/charts.js",
         "features/progressBars.js",
         "features/scoring.js",
         "overlay.js"   
