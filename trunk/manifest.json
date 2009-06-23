@@ -1,12 +1,13 @@
 {
   "name": "Chromomungo",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "description": "The infamous Popomundo ported to Chromium Extension System.",
   "content_scripts": [
     {
       "matches": [ "http://*.popmundo.com/*" ],
       "js": [
         "util/sprintf.js",
+		"constants/commonConstants.js",
         "constants/busTerminals.js",
         "constants/defaultPrefs.js",
         "constants/stringKeys.js",                        
