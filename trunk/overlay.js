@@ -152,7 +152,7 @@ function PopomungoOverlay() {
 						pm_UserSettings.updateSettingsOnLoad(aDocument);
 					}
 				}
-				/*else if (page == 'performances') {
+				else if (page == 'performances') {
 					if (action == undefined) {
 						action = pm_Performances.identifyUndefinedPerformancesPage(aDocument);
 					}
@@ -171,14 +171,14 @@ function PopomungoOverlay() {
 						// comingperformances clearallsetlists
 						// accept confirmdiscardp setcancelperformance 
 						pm_Performances.addSoldTicketsOnShowsPage(aDocument, true);
-						pm_Company.highlightCeoLocale(aDocument);
+						//pm_Company.highlightCeoLocale(aDocument);
 					}
 				}
 				else if (page == 'performancedetails') {
 					// nextshow defaultsetlist viewperformance addsong
 					// addaction removeaction
 					pm_ProgressBars.addTextOverStats(aDocument, pm_ProgressBars.WITH_MINUS_SIGN_REGEXP);
-				}
+				}/*
 				else if (page == 'company') {
 					if (action == 'shows' && 
 						!action2) 

@@ -50,7 +50,7 @@ var pm_Strings = {
         this.dict[pm_StringKeys.LINKS_LOCALES_MOVE_HERE_ABBREV] = "G";
         this.dict[pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS] = "Mostra Personaggi Presenti";
         this.dict[pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS_ABBREV] = "V";
-        
+        this.dict[pm_StringKeys.PERFORMANCES_DAYS_SOLD_DATA] = "%s giorni";
         pm_Logger.debug("InitStringBundle finished."); 
         
         return true;
@@ -66,9 +66,40 @@ var pm_Strings = {
         else
             return "MISS";
 	},
-	
-	
-	getLocalesString: function getLocalesString() {
-        s = "TODO";
-	}
+    
+	getString: function getString(aStringName, aFormatArgs) 
+	{
+		var s;
+
+		try {
+			if (aFormatArgs) {
+				pm_Logger.debug(aStringName +" with format string: " + aFormatArgs.join("; "));
+								
+                if ( aFormatArgs.length == 1 ) {
+                    s = sprintf(this.dict[aStringName], aFormatArgs[0]);
+                }
+                else if ( aFormatArgs.length == 2 ) {
+                    s = sprintf(this.dict[aStringName], aFormatArgs[0], aFormatArgs[1]);
+                }
+                else if ( aFormatArgs.length == 3 ) {
+                    s = sprintf(this.dict[aStringName], aFormatArgs[0], aFormatArgs[1], aFormatArgs[2]);
+                }
+                else if ( aFormatArgs.length == 4 ) {
+                    s = sprintf(this.dict[aStringName], aFormatArgs[0], aFormatArgs[1], aFormatArgs[2], aFormatArgs[3]);
+                }
+                else {  
+                    s = this.dict[aStringName];                
+                }
+			} else {
+				s = this.dict[aStringName];
+			}
+		}
+		catch(err) {
+			pm_Logger.logError(err);
+		};
+
+		pm_Logger.debug(aStringName +"='"+ s + "'");
+		
+		return s;
+	},
 };
