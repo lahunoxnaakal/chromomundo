@@ -39,8 +39,9 @@ var pm_Logger = {
 	 * @param message
 	 */
 	logError: function logError(message) {
-    
-		var msg = 'Popomungo: ' + message;
+	
+		var myCaller = this.logError.caller.name;
+		var msg = 'Popomungo: (' +myCaller + ') '+ message;
 
 		// Is exception?				
 		if (message.stack) {
