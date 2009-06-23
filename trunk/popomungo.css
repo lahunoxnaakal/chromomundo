@@ -1,0 +1,192 @@
+tr.DarkColumnHL .popomungo_highlight {
+	background-color: #ee8;
+}
+
+.popomungo_highlight { 
+	background-color: #ee6;
+}
+
+.popomungo_added { 
+	font-style: italic;
+}
+
+.popomungo_tickets { 
+	font-size: smaller;
+}
+
+.popomungo_optionAlert, 
+.popomungo_lowStockAlert,
+.popomungo_ticketLimitAlert,
+.popomungo_highTicketPriceAlert { 
+	color: #ff0000 !important; 
+	font-weight: bold; 
+}
+
+.popomungo_lowStockWarning,
+.popomungo_ticketLimitWarning,
+.popomungo_highTicketPriceWarning { 
+	color: #ff7f00 !important; 
+	font-weight: bold; 
+}
+
+.popomungo_ticketSalesInfoIcon, 
+.popomungo_ticketLimitAlertIcon,
+.popomungo_ticketLimitWarningIcon, 
+.popomungo_highTicketPriceAlertIcon
+.popomungo_highTicketPriceWarningIcon {
+	margin-left: 0.2em;
+}
+
+.popomungo_lowStockAlertIcon,
+.popomungo_lowStockWarningIcon {
+	margin-right: 0.2em;
+}
+
+.popomungo_overlay_container { 
+	position: relative; 
+}
+
+table.menu .popomungo_text_link, 
+table.menu .popomungo_icon_link {
+	display: none;
+}
+
+.popomungo_text_link {
+	font-weight: normal;
+	border-top: thin solid #bbb;
+	border-left: thin solid #bbb;
+	border-right: thin solid #999;
+	border-bottom: thin solid #999;
+	padding-left: 0.2em;
+	padding-right: 0.2em;
+	margin-right: 0.2em;
+}
+
+.popomungo_icon_link {
+	vertical-align: middle;
+	margin-right: 0.2em;
+}
+
+.popomungo_locale_icon {
+	vertical-align: middle;
+	height: 16px;
+	width: 16px;
+	margin-right: 0.2em;
+}
+
+.popomungo_moveHereLocaleIcon_overlay {
+	position: absolute;
+	z-index: 1;
+}
+
+.popomungo_progressbar {
+}
+
+.popomungo_bar_overlay_for_shows { 
+	font-size: smaller; 
+	position: absolute; 
+	z-index: 2; 
+	text-align: right; 
+	color: #000000;
+}
+
+.popomungo_bar_overlay { 
+	position: absolute; 
+	text-align: right;
+	color: #000000;
+}
+
+.popomungo_score {
+	font-weight: bold;
+}
+
+.popomungo_menubox {
+	position: absolute;
+	color: #000000;
+	background-color: #ffffff;
+	border: thin solid #000000;
+	padding: 1px;
+	z-index: 9;
+}
+	
+.popomungo_menubox table {
+	background-color: #ffffff;
+}
+
+.popomungo_menubox th {
+	background-color: #dfdfff;
+}
+
+.popomungo_menubox tr:hover {
+	background-color: #dfdfff;
+}
+
+.popomungo_menubox img {
+	vertical-align: text-bottom;
+}
+
+a.popomungo_disabled {
+	cursor: text;
+}
+
+.popomungo_route {
+	font-style: italic;
+	font-weight: bold;
+}
+
+#Menu13 .popomungo_route {
+	font-weight: normal !important;
+}
+
+.popomungo_highTicketPrice {
+	background-color: #ffa7a7;
+}
+
+.popomungo_highTicketPriceHL {
+	background-color: #ff8f8f;
+}
+
+.popomungo_showLessThan7Days {
+	background-color: #a7a7ff;
+}
+
+.popomungo_showLessThan7DaysHL {
+	background-color: #bfbfff;
+}
+
+.popomungo_showLessThan56Days {
+	background-color: #9fff9f;
+}
+
+.popomungo_showLessThan56DaysHL {
+	background-color: #bfffbf;
+}
+
+.popomungo_showMoreThan56Days {
+	background-color: #ffcf9f;
+}
+
+.popomungo_showMoreThan56DaysHL {
+	background-color: #ffe7bf;
+}
+
+.popomungo_hiddenOption {
+	display: none;
+}
+
+.popomungo_hiddenOptionVisible {
+	font-weight: bold;
+	color: #000000;
+	background-color: #ff0000 !important;
+}
+
+.popomungo_hiddenOptionVisibleHL {
+	font-weight: bold;
+	color: #000000;
+	background-color: #ff7744 !important;
+}
+
+#popomungo_showOptions {
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
