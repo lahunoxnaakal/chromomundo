@@ -119,17 +119,30 @@ var pm_Performances = {
 				pm_Logger.debug('No nodes, ignore the page');
 				return;
 			}
+			
+			pm_Logger.debug('Node 1= '+ dataNodes.snapshotItem(1).innerHTML);
+			pm_Logger.debug('Node 2= '+ dataNodes.snapshotItem(2).innerHTML);
+			pm_Logger.debug('Node 3= '+ dataNodes.snapshotItem(3).innerHTML);
+			pm_Logger.debug('Node 4= '+ dataNodes.snapshotItem(4).innerHTML);
+			pm_Logger.debug('Node 5= '+ dataNodes.snapshotItem(5).innerHTML);
+			pm_Logger.debug('Node 6= '+ dataNodes.snapshotItem(6).innerHTML);
+			pm_Logger.debug('Node 7= '+ dataNodes.snapshotItem(7).innerHTML);
+			pm_Logger.debug('Node 8= '+ dataNodes.snapshotItem(8).innerHTML);
+			pm_Logger.debug('Node 9= '+ dataNodes.snapshotItem(9).innerHTML);
+			pm_Logger.debug('Node 10= '+ dataNodes.snapshotItem(10).innerHTML);
+			pm_Logger.debug('Node 11= '+ dataNodes.snapshotItem(11).innerHTML);
+			pm_Logger.debug('Node 12= '+ dataNodes.snapshotItem(12).innerHTML);
 
-			var offsetA = this.getLastVisitOffset(dataNodes.snapshotItem(6));
-			var offsetB = offsetA + this.getCompetitionOffset(dataNodes.snapshotItem(6 + offsetA));
-			var offsetC = offsetB + this.getVipOffset(dataNodes.snapshotItem(8 + offsetB));
+			var offsetA = this.getLastVisitOffset(dataNodes.snapshotItem(7));
+			var offsetB = offsetA + this.getCompetitionOffset(dataNodes.snapshotItem(7 + offsetA));
+			var offsetC = offsetB + this.getVipOffset(dataNodes.snapshotItem(9 + offsetB));
 			
 			pm_Logger.debug('last visit='+ offsetA +', competition='+ 
 				(offsetB-offsetA) +', VIP='+ (offsetC-offsetB));
 
 			var nodeData = {
 				// Artist
-				showDateNode:     dataNodes.snapshotItem(1),
+				showDateNode:     dataNodes.snapshotItem(2),
 				// Venue
 				// Venue type
 				// Artist fame
@@ -138,20 +151,20 @@ var pm_Performances = {
 				// Competition (optional)
 				// (An empty row, excluded)
 				// Status
-				ticketsNode:      dataNodes.snapshotItem(7 + offsetB),
+				ticketsNode:      dataNodes.snapshotItem(8 + offsetB),
 				// Potential sales (VIP only)
 				// (Potential sales description row, excluded)
-				profitNode:       dataNodes.snapshotItem(8 + offsetC),
-				ticketPriceNode:  dataNodes.snapshotItem(9 + offsetC),
-				ticketLimitNode:  dataNodes.snapshotItem(10 + offsetC),
-				artistShare:      dataNodes.snapshotItem(11 + offsetC),
-				riderLimit:       dataNodes.snapshotItem(12 + offsetC),
-				reservedDateNode: dataNodes.snapshotItem(13 + offsetC)
+				profitNode:       dataNodes.snapshotItem(9 + offsetC),
+				ticketPriceNode:  dataNodes.snapshotItem(10 + offsetC),
+				ticketLimitNode:  dataNodes.snapshotItem(11 + offsetC),
+				artistShare:      dataNodes.snapshotItem(12 + offsetC),
+				riderLimit:       dataNodes.snapshotItem(13 + offsetC),
+				reservedDateNode: dataNodes.snapshotItem(14 + offsetC)
 				// Club option
 			};
 
-			var parsedData = this.parseArrangementsData(aDocument, nodeData);
-
+			var parsedData = this.parseArrangementsData(aDocument, nodeData);			
+			
 			if (!parsedData.showDate || !parsedData.reservedDate) {
 				return;
 			}
@@ -216,10 +229,20 @@ var pm_Performances = {
 				parsedData.artistShare = parseFloat(input_artistShare.value);
 				parsedData.artistShareInputElement = input_artistShare;
 			} else {
+				pm_Logger.debug('parsing ticketprice');
 				parsedData.ticketPrice = parseFloat(nodeData.ticketPriceNode.textContent);
+				pm_Logger.debug('parsing ticketlimit');
 				parsedData.ticketLimit = parseInt(nodeData.ticketLimitNode.textContent);
+				pm_Logger.debug('parsing artistShare');
 				parsedData.artistShare = parseFloat(nodeData.artistShare.textContent);
-				parsedData.currency = nodeData.profitNode.textContent.match(/\s(\S+)\s*$/)[1];
+				try{
+					pm_Logger.debug('parsing currency: ' + nodeData.profitNode.textContent);
+					parsedData.currency = nodeData.profitNode.textContent.match(/\s(\S+)\s*$/)[1];
+				}
+				catch(err){
+					parsedData.currency = "€";
+					pm_Logger.logError(err);
+				}
 			}
 	
 			pm_Logger.debug('ticket price='+parsedData.ticketPrice +
@@ -325,12 +348,15 @@ var pm_Performances = {
 			this.calculateSalesEstimates(parsedData);
 			
 			if (parsedData.daysSold > 0) { 
-				this.addDaysToSell(aDocument, parsedData, nodeData);
+				// non ci sta piu' a fare un cazzo
+				// this.addDaysToSell(aDocument, parsedData, nodeData);
 				this.addSalesEstimatesAfterStart(aDocument, parsedData, nodeData);
 			}
-			else {
+			// non so se è una feature VIP, ma io gia li vedo i giorni che restano
+/*			else {
+				
 				this.addDaysToSell(aDocument, parsedData, nodeData);
-			}
+			}*/
 		}
 		catch (err)	 {
 			pm_Logger.logError(err);
@@ -1435,6 +1461,8 @@ var pm_Performances = {
 	 */
 	getVipOffset: function getVipOffset(aNode) {
 		var nextRow = pm_NextSibling(aNode.parentNode, "TR");
+		
+		pm_Logger.debug("nextRow: " + nextRow + nextRow.innerHTML);
 		
 		// If VIP, the next row contains only a description.
 		if (nextRow && nextRow.cells.length == 1) {
