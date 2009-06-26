@@ -50,22 +50,41 @@ var pm_Strings = {
         this.dict[pm_StringKeys.LINKS_LOCALES_MOVE_HERE_ABBREV] = "G";
         this.dict[pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS] = "Mostra Personaggi Presenti";
         this.dict[pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS_ABBREV] = "V";
-        this.dict[pm_StringKeys.PERFORMANCES_DAYS_SOLD_DATA] = "%s giorni";
+        
+		this.dict[pm_StringKeys.PERFORMANCES_DAYS_SOLD_DATA] = "%s giorni";
+		this.dict[pm_StringKeys.PERFORMANCES_DAYS_SOLD_HOVER] = "Numero di giorni tra la prenotazione e lo spettacolo.";
+		this.dict[pm_StringKeys.PERFORMANCES_DAYS_SOLD_TITLE] = "Giorni venduti";
+		this.dict[pm_StringKeys.PERFORMANCES_DAYS_TO_SELL_TITLE] = "Giorni rimanenti";
+		this.dict[pm_StringKeys.PERFORMANCES_DAYS_TO_SELL_AFTER_START_DATA] = "%s giorni (%s giorni venduti)";
+		this.dict[pm_StringKeys.PERFORMANCES_DAYS_TO_SELL_BEFORE_START_DATA] = "%s giorni (inizia tra %s giorni)";		
+		this.dict[pm_StringKeys.PERFORMANCES_ESTIMATED_INCOME_FOR_ARTIST_DATA] = "%s = %s biglietti * %s";
+		this.dict[pm_StringKeys.PERFORMANCES_ESTIMATED_INCOME_FOR_ARTIST_TITLE] = "Ricavo Stimato (Artista)";
+		this.dict[pm_StringKeys.PERFORMANCES_ESTIMATED_INCOME_FOR_CLUB_DATA] = "%s = %s biglietti * %s";
+		this.dict[pm_StringKeys.PERFORMANCES_ESTIMATED_INCOME_FOR_CLUB_TITLE] = "Ricavo Stimato (Club)";
+		this.dict[pm_StringKeys.PERFORMANCES_ESTIMATED_SALES_DATA] = "%s biglietti (%s biglietti al giorno)";
+		this.dict[pm_StringKeys.PERFORMANCES_ESTIMATED_SALES_TITLE] = "Vendite stimate";
+		this.dict[pm_StringKeys.PERFORMANCES_INCOME_AVERAGE_PER_SHOW] = "Guadagno medio per spettacolo: %s";
+		this.dict[pm_StringKeys.PERFORMANCES_INCOME_ESTIMATED_TOTAL_VALUE] = "Totale stimato: %s";
+		this.dict[pm_StringKeys.PERFORMANCES_INCOME_TOTAL_VALUE] = "Guadagno totale: %s";
+		this.dict[pm_StringKeys.PERFORMANCES_SHOWS_COUNT] = "Numero di concerti: %s";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKETS_COUNT] = "Biglietti venduti: %s";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKETS_ESTIMATED_TOTAL_COUNT] = "Stima dei biglietti venduti: %s";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKETS_PERCENT] = "Biglietti riservati: %s%%";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKETS_PER_DAY_DATA] = "%s biglietti";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKETS_PER_DAY_HOVER] = "Numero medio di biglietti venduti al giorno.";		
+		this.dict[pm_StringKeys.PERFORMANCES_TICKETS_PER_DAY_TITLE] = "Biglietti al giorno";		
+		this.dict[pm_StringKeys.PERFORMANCES_TICKETS_RATIO] = "Biglietti riservati: %s / %s";		
+		this.dict[pm_StringKeys.PERFORMANCES_TICKET_LIMIT_ESTIMATE_DATA] = "Guadagni stimati = %s (%s)";				
+		this.dict[pm_StringKeys.PERFORMANCES_TICKET_LIMIT_ESTIMATE_HOVER] = "%s biglietti * %s - %s";				
+		this.dict[pm_StringKeys.PERFORMANCES_TICKET_LIMIT_ESTIMATE_TITLE] = "Limite ai biglietti %s";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKET_LIMIT_NEAR] = "Si avvicina il limite di biglietti.";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKET_LIMIT_REACHED] = "Il limite di biglietti \u00e8 stato raggiunto.";
+		this.dict[pm_StringKeys.PERFORMANCES_TICKET_PRICE_HIGH] = "Il prezzo dei biglietti \u00e8 alto.";				
+						
         pm_Logger.debug("InitStringBundle finished."); 
         
         return true;
-	},
-	
-
-	getString: function getString(aStringName, aFormatArgs) 
-	{    
-        pm_Logger.debug("Requesting String: " + aStringName + " Result = " + this.dict[aStringName]); 
-        
-        if ( this.dict[aStringName] != "" )
-            return this.dict[aStringName];
-        else
-            return "MISS";
-	},
+	},	
     
 	getString: function getString(aStringName, aFormatArgs) 
 	{
@@ -74,6 +93,8 @@ var pm_Strings = {
 		try {
 			if (aFormatArgs) {
 				pm_Logger.debug(aStringName +" with format string: " + aFormatArgs.join("; "));
+				pm_Logger.debug(aStringName +" = " + this.dict[aStringName]);
+				pm_Logger.debug("args count = " + aFormatArgs.length);
 								
                 if ( aFormatArgs.length == 1 ) {
                     s = sprintf(this.dict[aStringName], aFormatArgs[0]);
