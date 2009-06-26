@@ -1,0 +1,20 @@
+#summary One-sentence summary of this page.
+#labels Featured,Phase-Support,Phase-Implementation
+
+= Introduction =
+
+Small page to track changes in time.
+
+
+= What's New =
+
+0.9.4
+> * Some fixes in performance page
+> - Removed "Remaining Days" section from performance page ( it was redundant to me )
+
+Known Bugs: 
+
+> * chromomundo is in italian language only because Chrome's extension system lacks an easy way to localize extensions.
+
+0.9.3
+> + First Release
