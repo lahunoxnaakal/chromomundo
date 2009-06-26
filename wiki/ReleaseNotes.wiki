@@ -1,10 +1,5 @@
-#summary One-sentence summary of this page.
+#summary Small page to track changes in time.
 #labels Featured,Phase-Support,Phase-Implementation
-
-= Introduction =
-
-Small page to track changes in time.
-
 
 = What's New =
 
