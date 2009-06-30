@@ -1,6 +1,6 @@
 /*
  * performances.js
- * Copyright © 2007, 2008 Tommi Rautava
+ * Copyright (C) 2007-2009 Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -119,19 +119,6 @@ var pm_Performances = {
 				pm_Logger.debug('No nodes, ignore the page');
 				return;
 			}
-			
-			pm_Logger.debug('Node 1= '+ dataNodes.snapshotItem(1).innerHTML);
-			pm_Logger.debug('Node 2= '+ dataNodes.snapshotItem(2).innerHTML);
-			pm_Logger.debug('Node 3= '+ dataNodes.snapshotItem(3).innerHTML);
-			pm_Logger.debug('Node 4= '+ dataNodes.snapshotItem(4).innerHTML);
-			pm_Logger.debug('Node 5= '+ dataNodes.snapshotItem(5).innerHTML);
-			pm_Logger.debug('Node 6= '+ dataNodes.snapshotItem(6).innerHTML);
-			pm_Logger.debug('Node 7= '+ dataNodes.snapshotItem(7).innerHTML);
-			pm_Logger.debug('Node 8= '+ dataNodes.snapshotItem(8).innerHTML);
-			pm_Logger.debug('Node 9= '+ dataNodes.snapshotItem(9).innerHTML);
-			pm_Logger.debug('Node 10= '+ dataNodes.snapshotItem(10).innerHTML);
-			pm_Logger.debug('Node 11= '+ dataNodes.snapshotItem(11).innerHTML);
-			pm_Logger.debug('Node 12= '+ dataNodes.snapshotItem(12).innerHTML);
 
 			var offsetA = this.getLastVisitOffset(dataNodes.snapshotItem(7));
 			var offsetB = offsetA + this.getCompetitionOffset(dataNodes.snapshotItem(7 + offsetA));
@@ -141,6 +128,7 @@ var pm_Performances = {
 				(offsetB-offsetA) +', VIP='+ (offsetC-offsetB));
 
 			var nodeData = {
+				// << | >>
 				// Artist
 				showDateNode:     dataNodes.snapshotItem(2),
 				// Venue
@@ -163,8 +151,8 @@ var pm_Performances = {
 				// Club option
 			};
 
-			var parsedData = this.parseArrangementsData(aDocument, nodeData);			
-			
+			var parsedData = this.parseArrangementsData(aDocument, nodeData);
+
 			if (!parsedData.showDate || !parsedData.reservedDate) {
 				return;
 			}
@@ -229,20 +217,10 @@ var pm_Performances = {
 				parsedData.artistShare = parseFloat(input_artistShare.value);
 				parsedData.artistShareInputElement = input_artistShare;
 			} else {
-				pm_Logger.debug('parsing ticketprice');
 				parsedData.ticketPrice = parseFloat(nodeData.ticketPriceNode.textContent);
-				pm_Logger.debug('parsing ticketlimit');
 				parsedData.ticketLimit = parseInt(nodeData.ticketLimitNode.textContent);
-				pm_Logger.debug('parsing artistShare');
 				parsedData.artistShare = parseFloat(nodeData.artistShare.textContent);
-				try{
-					pm_Logger.debug('parsing currency: ' + nodeData.profitNode.textContent);
-					parsedData.currency = nodeData.profitNode.textContent.match(/\s(\S+)\s*$/)[1];
-				}
-				catch(err){
-					parsedData.currency = "€";
-					pm_Logger.logError(err);
-				}
+				parsedData.currency = nodeData.profitNode.textContent.match(/\s(\S+)\s*$/)[1];
 			}
 	
 			pm_Logger.debug('ticket price='+parsedData.ticketPrice +
@@ -969,12 +947,12 @@ var pm_Performances = {
 				return;
 			}
 			
-			var highTicketPriceAlertLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKETS_HIGH_PRICE_ALERT_LEVEL);
-			var highTicketPriceWarningLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKETS_HIGH_PRICE_WARNING_LEVEL);
+			var highTicketPriceAlertLimit = pm_Prefs.getPref(pm_PrefKeys.TICKETS_HIGH_PRICE_ALERT_LEVEL, 99);
+			var highTicketPriceWarningLimit = pm_Prefs.getPref(pm_PrefKeys.TICKETS_HIGH_PRICE_WARNING_LEVEL, 59);
 			var lowTicketLimitDaysLeftAlertLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKET_LIMITS_DAYS_LEFT_ALERT_LEVEL);
 			var lowTicketLimitDaysLeftWarningLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKET_LIMITS_DAYS_LEFT_WARNING_LEVEL);
-			var lowTicketLimitPercentageAlertLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_ALERT_LEVEL);
-			var lowTicketLimitPercentageWarningLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_WARNING_LEVEL);
+			var lowTicketLimitPercentageAlertLimit = pm_Prefs.getPref(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_ALERT_LEVEL, 90);
+			var lowTicketLimitPercentageWarningLimit = pm_Prefs.getPref(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_WARNING_LEVEL, 70);
 			
 			var nodes = pm_XPathOrderedSnapshot(this.dataRowsOnClubShowsPageXpath, aDocument);
 
@@ -1461,8 +1439,6 @@ var pm_Performances = {
 	 */
 	getVipOffset: function getVipOffset(aNode) {
 		var nextRow = pm_NextSibling(aNode.parentNode, "TR");
-		
-		pm_Logger.debug("nextRow: " + nextRow + nextRow.innerHTML);
 		
 		// If VIP, the next row contains only a description.
 		if (nextRow && nextRow.cells.length == 1) {

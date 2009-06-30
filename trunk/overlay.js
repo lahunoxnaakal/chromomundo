@@ -144,7 +144,7 @@ function PopomungoOverlay() {
 					else {
 						pm_UserSettings.updateSettingsFromCityPage(aDocument);
 						//pm_Traveling.addRouteInfoOnCityPage(aDocument);
-						//pm_Locales.addLocaleIcons(aDocument);
+						pm_Locales.addLocaleIcons(aDocument);
 					}
 				}
 				else if (page == 'user') {
@@ -171,14 +171,14 @@ function PopomungoOverlay() {
 						// comingperformances clearallsetlists
 						// accept confirmdiscardp setcancelperformance 
 						pm_Performances.addSoldTicketsOnShowsPage(aDocument, true);
-						//pm_Company.highlightCeoLocale(aDocument);
+						pm_Company.highlightCeoLocale(aDocument);
 					}
 				}
 				else if (page == 'performancedetails') {
 					// nextshow defaultsetlist viewperformance addsong
 					// addaction removeaction
 					pm_ProgressBars.addTextOverStats(aDocument, pm_ProgressBars.WITH_MINUS_SIGN_REGEXP);
-				}/*
+				}
 				else if (page == 'company') {
 					if (action == 'shows' && 
 						!action2) 
@@ -195,7 +195,7 @@ function PopomungoOverlay() {
 						pm_Products.highlightEmptyStockIfFormPage(aDocument);
 					}
 					// SetBidLocale
-				}*/
+				}
 				else if (page == 'characterdetails') {
 					if (action == undefined) {
 						action = pm_ProgressBars.identifyUndefinedCharacterDetailsPage(aDocument);
@@ -274,14 +274,14 @@ function PopomungoOverlay() {
 					// setrepertoirepractise viewartistsong confirmdiscardas
 					pm_ProgressBars.addTextOverStats(aDocument, pm_ProgressBars.WITH_MINUS_SIGN_REGEXP);
  				}
-				/*else if (page == 'bookings') {
+				else if (page == 'bookings') {
 					if (action == undefined ||
 						action == 'setdelete')
 					{
 						pm_Performances.addSoldTicketsOnSchedulePage(aDocument);
 					}
 					// QuickBook, SearchBookings, SearchJams, SearchStudio, Delete
-				}*/
+				}
 				else if (page == 'song') {
 					// viewunfinished view viewsong deletesongconfirmed
 					// setworkonsong undefined
@@ -324,7 +324,7 @@ function PopomungoOverlay() {
 						pm_Traveling.addRouteInfoOnHighwayLocalePage(aDocument);
 					}*/					
 				}
-				/*else if (page == 'competition') {
+				else if (page == 'competition') {
 					if (action == 'schedule' ||
 						action == 'deleteinvite' ||
 						action == 'addopeninvite' ||
@@ -332,13 +332,13 @@ function PopomungoOverlay() {
 					{
 						pm_Competitions.colorizeCompetitionEntries(aDocument);
 					}
-				}*/
+				}
 				else if (page == 'distributeexp') {
 					pm_ProgressBars.addTextOverStats(aDocument);
-				}/*
+				}
 				else if (page == 'charts') {
 					if (action == 'paparazzilist') {
-						pm_Friends.highlightCityOnPaparazziList(aDocument);
+						//pm_Friends.highlightCityOnPaparazziList(aDocument);
 					}
 					else if (action == 'topstarquality' ||
 						action == 'artistrankings' ||
@@ -355,7 +355,7 @@ function PopomungoOverlay() {
 					{
 						pm_ProgressBars.addTextOverStats(aDocument);
 					}
-				}*/
+				}
 				else {
 					pm_Logger.debug("No actions");
 				}
