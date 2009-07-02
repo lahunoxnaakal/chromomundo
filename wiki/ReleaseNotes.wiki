@@ -3,6 +3,12 @@
 
 = What's New =
 
+=== 0.9.8 ===
+{{{
+* Even more fixes in performance page
+* Added features for the CEO page, locals and products pages.
+}}}
+
 === 0.9.4 ===
 {{{
 * Some fixes in performance page
