@@ -27,6 +27,7 @@ var pm_Prefs = {
 		128: "PREF_BOOL"
 	},
 	
+    dict: {},
 	/*
 	 * Is preference set?
 	 * 
@@ -34,7 +35,8 @@ var pm_Prefs = {
 	 */
 	exists: function exists(aPrefName) 
 	{
-		return false;
+        console.log("this.dict[" + aPrefName + "] = " + this.dict[aPrefName] );
+		return this.dict[aPrefName] != undefined; 
 	},
 
 	
@@ -63,7 +65,14 @@ var pm_Prefs = {
 	 */
 	getPref: function getPref(aPrefName, aDefaultValue) 
 	{
-		return aDefaultValue;
+        if ( this.exists(aPrefName) == true )
+        {
+            return this.dict[aPrefName];
+        }
+        else
+        {
+            return aDefaultValue;
+        }
 	},
 	
 	/*
@@ -74,6 +83,9 @@ var pm_Prefs = {
 	 */
 	setPref: function setPref(aPrefName, aValue) 
 	{
+        console.log("Setting preference " + aPrefName + " with value:" +  aValue);
+        this.dict[aPrefName] = aValue;
+        port.postMessage({message: "SetPref!", values: [aPrefName,aValue]});
 		return true;
 	},
 
@@ -163,7 +175,7 @@ var pm_Prefs = {
 	 * @param aDefaultValue
 	 */
 	isEnabled: function isEnabled(aPrefName) {
-		return pm_Prefs.getPref(aPrefName, true);
+		return pm_Prefs.getPref(aPrefName, false);
 	},
 	
 	/*

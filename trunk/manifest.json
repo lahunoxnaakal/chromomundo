@@ -1,7 +1,8 @@
 {
   "name": "Chromomungo",
-  "version": "0.9.8",
+  "version": "0.9.61",
   "description": "The infamous Popomundo ported to Chromium Extension System.",
+  "background_page": "background.html",
   "content_scripts": [
     {
       "matches": [ "http://*.popmundo.com/*" ],

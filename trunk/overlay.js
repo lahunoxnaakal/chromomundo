@@ -18,6 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+*   This file has been modified by Daniele Simonetti
+*   This file is part of Chromomungo, a free chrome extension
+*   ported from Popomungo, the Firefox's original Extension.
+*/
+
 function PopomungoOverlay() {
 	this.localeStrings = undefined;
 	
@@ -45,11 +51,13 @@ function PopomungoOverlay() {
 
 			this.requestCount++;
 			
+            /*
 			pm_Logger.debug("Request #"+ this.requestCount
 				+"\nhref="+ aDocument.location.href +
 				"\npath="+ path1 +
 				"\nquery="+ query1);
-
+                                */
+                                
 			// Remove frames
 			if (path1 == '/common/index.html' && 
 				pm_Logger.getTraceLevel()) 
@@ -79,11 +87,12 @@ function PopomungoOverlay() {
 				action2 = result[1].toLowerCase();
 			}
 
+            /*
 			pm_Logger.debug("Request #"+ this.requestCount +
 				"\npage="+ page +
 				"\naction="+ action +
 				"\naction2="+ action2);
-
+                                */
 			var processLinksEnabled = true;
 	
 			if (page == undefined) {
@@ -503,15 +512,25 @@ function PopomungoOverlay() {
 	};
 
 	this.toString = function toString() {
-		return "[object PopomungoOverlay]";
+		return "[object ChromomungoOverlay]";
 	};
 };
 
-console.log("Popomungo: page loaded!");
+function onMessageReceived(data)
+{
+    if ( data.message == "Hello!" )
+    {        
+        pm_Prefs.dict = data.values;       
+        pm_Overlay.handleContent(document);
+    }
+}
+
+console.log("Chromomungo: page loaded!");
+var port = chrome.extension.connect();
+port.onMessage.addListener(onMessageReceived); 
+port.postMessage({message: "Hello!", values: [1,2,3]});
 var pm_Overlay = new PopomungoOverlay();
-pm_Overlay.handleContent(document);
-//window.addEventListener("unload", pm_Overlay, false);
-//window.addEventListener("load", pm_Overlay, false);
+//pm_Overlay.handleContent(document);
 
 ///////////////////////////////////////////////////////////////////////
 // EOF
