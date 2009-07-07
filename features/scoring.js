@@ -214,8 +214,9 @@ var pm_Scoring = {
 					pm_Logger.debug("scoreId="+ scoreId);
 					
 					// Map the id to numeric score.
-					var score = scoreId + scoreBase;
-					
+					var score = scoreId + parseInt(scoreBase);
+					pm_Logger.debug('var score = '+ scoreId + " + " + scoreBase + " = " + score);
+                    
 					var scoreNode = aDocument.createElement('span');
 					scoreNode.className = 'popomungo_score';
 					
