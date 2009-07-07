@@ -947,12 +947,12 @@ var pm_Performances = {
 				return;
 			}
 			
-			var highTicketPriceAlertLimit = pm_Prefs.getPref(pm_PrefKeys.TICKETS_HIGH_PRICE_ALERT_LEVEL, 99);
-			var highTicketPriceWarningLimit = pm_Prefs.getPref(pm_PrefKeys.TICKETS_HIGH_PRICE_WARNING_LEVEL, 59);
+			var highTicketPriceAlertLimit = parseInt(pm_Prefs.getPref(pm_PrefKeys.TICKETS_HIGH_PRICE_ALERT_LEVEL, 99));
+			var highTicketPriceWarningLimit = parseInt(pm_Prefs.getPref(pm_PrefKeys.TICKETS_HIGH_PRICE_WARNING_LEVEL, 59));
 			var lowTicketLimitDaysLeftAlertLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKET_LIMITS_DAYS_LEFT_ALERT_LEVEL);
 			var lowTicketLimitDaysLeftWarningLimit = pm_Prefs.isEnabled(pm_PrefKeys.TICKET_LIMITS_DAYS_LEFT_WARNING_LEVEL);
-			var lowTicketLimitPercentageAlertLimit = pm_Prefs.getPref(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_ALERT_LEVEL, 90);
-			var lowTicketLimitPercentageWarningLimit = pm_Prefs.getPref(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_WARNING_LEVEL, 70);
+			var lowTicketLimitPercentageAlertLimit = parseInt(pm_Prefs.getPref(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_ALERT_LEVEL, 90));
+			var lowTicketLimitPercentageWarningLimit = parseInt(pm_Prefs.getPref(pm_PrefKeys.TICKET_LIMITS_PERCENTAGE_WARNING_LEVEL, 70));
 			
 			var nodes = pm_XPathOrderedSnapshot(this.dataRowsOnClubShowsPageXpath, aDocument);
 
@@ -1061,7 +1061,8 @@ var pm_Performances = {
 								var daysLeft = ((ticketsLimit - ticketsSold) / parsedData.ticketsSoldPerDay).toFixed(1);
 								var percentage = (ticketsSold / ticketsLimit * 100).toFixed(1);
 								
-								//pm_Logger.debug('daysLeft='+ daysLeft +', percentage='+ percentage);
+								pm_Logger.debug('daysLeft='+ daysLeft +', percentage='+ percentage);
+								pm_Logger.debug('alertLimit='+ lowTicketLimitPercentageAlertLimit +', warningLimit='+ lowTicketLimitPercentageWarningLimit);
 								
 								if (daysLeft <= lowTicketLimitDaysLeftAlertLimit ||
 									percentage >= lowTicketLimitPercentageAlertLimit) 
