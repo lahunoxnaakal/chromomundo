@@ -2,6 +2,12 @@
 #labels Featured,Phase-Support,Phase-Implementation
 
 = What's New =
+=== 0.9.61 ===
+{{{
+* Finally, a preference system. Now you can set your preferences using bookmarks :)
+* A new bookmark folder named "Chromomungo Settings" will be created upon installation.
+* I hope I can bring localization with this system!! :D
+}}}
 
 === 0.9.8 ===
 {{{
