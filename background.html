@@ -44,13 +44,13 @@ function fillDictionary(doSendPrefs)
     chrome.bookmarks.getChildren(bm_ParentID, function(results)
     {
         console.log("Found " + results.length + " settings.");
+		cm_CanSendSettings = true;
         for (var i = 0; i < results.length; i++) 
         {
             var sKey = results[i].title;
             var sValue = results[i].url;
             sValue = sValue.substring(bmname.length);
-            cm_UserPreferences[sKey] = sValue;
-            cm_CanSendSettings = true;            
+            cm_UserPreferences[sKey] = sValue;                       
         }                
         
         if ( doSendPrefs == true )
@@ -92,9 +92,8 @@ function createParentBM()
         'url': undefined}, function(newbookmark) 
         {       
             console.log("bm_ParentID: " + newbookmark.id);
-            bm_ParentID = newbookmark.id;
-            
-            setValue("Example", 1);
+            bm_ParentID = newbookmark.id;   
+			setValue("enabled", "true");
         }  
    );  
 }
