@@ -1,6 +1,6 @@
-/*
+/**
  * stringKeys.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -19,6 +19,8 @@
 */
 
 var pm_StringKeys = {
+	BOOKMARKS_MENU_TITLE: 'bookmarks.menu.title',
+		
 	INTERACTION_SHOW_HIDDEN_OPTIONS: 'interaction.showHiddenOptions',
 	
 	LINKS_CHARACTERS_CALL: 'links.characters.call',

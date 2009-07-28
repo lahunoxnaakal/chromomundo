@@ -32,40 +32,50 @@ function PopomungoOverlay() {
 	this.listenerEnabled = false;
 	
 	this.ignoredPages = {
+		'cheater': true,
 		'cn': true,
 		'defaultconf': true,
 		'defaultconfv2': true,
 		'forumtop': true,
 		'gazette': true,
 		'menuforum': true,
+		'pageexpired': true,
 		'performancelive': true,
 		'wallpaper': true
 	}
 	
 
+	/**
+	 * Process a game page.
+	 *  
+	 * @param {Document} aDocument
+	 */
 	this.handleContent = function handleContent(aDocument) {
 		try {
+			this.requestCount++;
+			
 			var date1 = new Date();
 			var path1 = aDocument.location.pathname;
 			var query1 = aDocument.location.search;
 
-			this.requestCount++;
-			
-            /*
 			pm_Logger.debug("Request #"+ this.requestCount
 				+"\nhref="+ aDocument.location.href +
 				"\npath="+ path1 +
 				"\nquery="+ query1);
-                                */
-                                
+
 			// Remove frames
 			if (path1 == '/common/index.html' && 
 				pm_Logger.getTraceLevel()) 
 			{
-				var frame1 = aDocument.getElementsByTagName('frame')[0];
-				if (frame1.src) {
-					pm_Logger.debug('Redirecting to '+ frame1.src);
-					aDocument.location.replace(frame1.src);
+				var frames = aDocument.getElementsByTagName('frame');
+
+				if (frames.length > 0) {
+					var frame1 = frames[0];
+					
+					if (frame1.src) {
+						pm_Logger.debug('Redirecting to '+ frame1.src);
+						aDocument.location.replace(frame1.src);
+					}
 				}
 				return;
 			}
@@ -92,7 +102,9 @@ function PopomungoOverlay() {
 				"\npage="+ page +
 				"\naction="+ action +
 				"\naction2="+ action2);
-                                */
+			*/
+
+			var processScoreNumbersEnabled = true;
 			var processLinksEnabled = true;
 	
 			if (page == undefined) {
@@ -148,13 +160,24 @@ function PopomungoOverlay() {
 				pm_Logger.debug("Main-tasks");
 
 				if (page == 'city') {
-					if (action == 'online') {
-					}
-					else {
-						pm_UserSettings.updateSettingsFromCityPage(aDocument);
-						//pm_Traveling.addRouteInfoOnCityPage(aDocument);
+					if (action == 'view' ||
+						action == undefined) 
+					{
 						pm_Locales.addLocaleIcons(aDocument);
+
+						//pm_UserSettings.updateSettingsFromCityPage(aDocument);
+						//pm_Traveling.addRouteInfoOnCityPage(aDocument);						
+
+						// Too many links here, we will need to use another methods.
+						processScoreNumbersEnabled = false;
+						pm_Scoring.addNumericScoresOnCityPage(aDocument);
+
+						processLinksEnabled = false;
+						pm_Links.addEventHandlerOnCityPage(aDocument);
 					}
+					// online onlinesamelanguage newbies 
+					// ongoingshows topchart viewfriends 
+					// bookmarkedlocales
 				}
 				else if (page == 'user') {
 					if (action == 'update') {
@@ -187,6 +210,8 @@ function PopomungoOverlay() {
 					// nextshow defaultsetlist viewperformance addsong
 					// addaction removeaction
 					pm_ProgressBars.addTextOverStats(aDocument, pm_ProgressBars.WITH_MINUS_SIGN_REGEXP);
+					
+					processLinksEnabled = false;
 				}
 				else if (page == 'company') {
 					if (action == 'shows' && 
@@ -373,7 +398,9 @@ function PopomungoOverlay() {
 
 				pm_Logger.debug("Post-tasks");
 
-				pm_Scoring.addNumericScores(aDocument);
+				if (processScoreNumbersEnabled) {
+					pm_Scoring.addNumericScores(aDocument);					
+				}
 				
 				if (processLinksEnabled) {
 					pm_Links.processLinks(aDocument);
@@ -518,10 +545,26 @@ function PopomungoOverlay() {
 
 function onMessageReceived(data)
 {
+    console.log("Received message from Extension: " + data.message + "data: " + data.values);
+    
     if ( data.message == "Hello!" )
     {        
-        pm_Prefs.dict = data.values;       
-        pm_Overlay.handleContent(document);
+        pm_Prefs.dict = data.values; 
+        /* 
+        for ( var i = 0; i < pm_Prefs.dict.length; i++ )
+        {
+            console.log(pm_Prefs.dict[i]);
+        }*/
+                
+        if ( pm_Prefs.isEnabled(pm_PrefKeys.ENABLED) )
+        {
+            console.log("Chromomungo is ENABLED");
+            pm_Overlay.handleContent(document);
+        }
+        else
+        {
+            console.log("Chromomungo is DISABLED");
+        }               
     }
 }
 

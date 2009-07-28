@@ -20,7 +20,7 @@
 */
 
 
-/*
+/**
  * @param city
  */
 function pm_BusTerminalData(city) {
@@ -47,13 +47,13 @@ var pm_BusTerminals = {
 		35473:   new pm_BusTerminalData(18),	// Moscow
 		35474:   new pm_BusTerminalData(19),	// Helsinki
 		35475:   new pm_BusTerminalData(20),	// Paris
-		53595:   new pm_BusTerminalData(21),	// S�o Paulo
+		53595:   new pm_BusTerminalData(21),	// Sao Paulo
 		72403:   new pm_BusTerminalData(23),	// Rome 
 		81722:   new pm_BusTerminalData(10),	// Melbourne 
 		88604:   new pm_BusTerminalData(22),	// Copenhagen
 		103127:  new pm_BusTerminalData(24),	// Madrid
 		104741:  new pm_BusTerminalData(25),	// Rio de Janeiro 
-		106201:  new pm_BusTerminalData(26),	// Troms�
+		106201:  new pm_BusTerminalData(26),	// Tromso
 		111706:  new pm_BusTerminalData(27),	// Glasgow
 		122918:  new pm_BusTerminalData(28),	// Vilnius
 		131990:  new pm_BusTerminalData(29),	// Dubrovnik
@@ -84,4 +84,4 @@ var pm_BusTerminals = {
 
 		return (data ? data.city : undefined); 
 	}
-}
+};

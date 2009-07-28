@@ -1,6 +1,6 @@
-/*
+/**
  * products.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -30,10 +30,6 @@ var pm_Products = {
 	highlightEmptyStock:
 	function highlightEmptyStock(aDocument, aXpath) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.HIGHLIGHTING_FEATURES_ENABLED)) {
-				return;
-			}
-	
 			if (!pm_Prefs.isEnabled(pm_PrefKeys.HIGHLIGHTING_LOW_STOCK_ENABLED)) {
 				return;
 			}
@@ -85,7 +81,7 @@ var pm_Products = {
 	function highlightEmptyStockOnRestock(aDocument) {
 		var xpath1 = "/html/body/table[last()]/tbody/tr/td[1]/table[2]/tbody/tr/td/form/table/tbody/tr/td[2]";
 
-		return this.highlightEmptyStock(aDocument, xpath1)
+		this.highlightEmptyStock(aDocument, xpath1);
 	},
 	
 	
@@ -93,7 +89,7 @@ var pm_Products = {
 	function highlightEmptyStockOnManageProducts(aDocument) {
 		var xpath1 = "/html/body/table[last()]/tbody/tr/td[1]/table[2]/tbody/tr/td/form/table/tbody/tr/td[3]";
 
-		return this.highlightEmptyStock(aDocument, xpath1)
+		this.highlightEmptyStock(aDocument, xpath1);
 	},
 	
 	

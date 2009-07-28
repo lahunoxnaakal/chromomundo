@@ -1,6 +1,6 @@
-/*
+/**
  * performances.js
- * Copyright (C) 2007-2009 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -62,19 +62,19 @@ var pm_Performances = {
 		'/html/body/table[last()]/tbody/tr/td[1]/table[2]/tbody/tr/td/table/tbody/tr',
 //		'/html/body/table[last()]/tbody/tr/td[1]/table[2]/tbody/tr/td/table/tbody/tr[position() mod 2 = 0]',
 		
-	/* Ticket limit regular expression.
+	/** Ticket limit regular expression.
 	 * Option: 1000 (Additional cost: 200 US$)
 	 */
 	ticketLimitRegExp: 
 		/^(\d+) \(.*[:\uFF1A] *(\d+\s?\d*) (.+)\)/,
 	
-	/* Ticket price regular expression.
+	/** Ticket price regular expression.
 	 * 20 US$
 	 */
 	ticketPriceRegExp: 
 		/^([0-9\.]+)( .+)/,
 
-	/* 349 / 500 reserved */
+	/** 349 / 500 reserved */
 	soldTicketsRegExp: 
 		/^(\d+) \/ (\d+)/,
 		
@@ -98,10 +98,6 @@ var pm_Performances = {
 	processArrangements: 
 	function processArrangements(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_FEATURES_ENABLED)) {
-				return;
-			}
-			
 			var salesEstimates = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SALES_ESTIMATES);
 			var reverseLimits = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_REVERSE_LIMITS);
 			var addProgressBar = pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_ADD_SOLD_TICKETS_PROGRESSBAR);
@@ -177,7 +173,7 @@ var pm_Performances = {
 			if (reverseLimits && parsedData.isCEOView) {
 				var select_limit = parsedData.ticketLimitSelectElement;
 				
-				for (var i=select_limit.options.length - 1; i>=0; i--) {
+				for (var i=select_limit.options.length - 1; i > -1; i--) {
 					var elem = select_limit.options.item(i);
 					select_limit.removeChild(elem);
 					select_limit.appendChild(elem);
@@ -253,7 +249,7 @@ var pm_Performances = {
 		return parsedData;
 	},
 
-	/*
+	/**
 	 * Calculate sales estimates.
 	 * 
 	 * input:
@@ -464,7 +460,7 @@ var pm_Performances = {
 	},
 
 
-	/*
+	/**
 	 * Check if ticket limit should be raised.
 	 */
 	checkTicketLimits: function checkTicketLimits(aDocument, parsedData) {
@@ -482,7 +478,7 @@ var pm_Performances = {
 				
 				var newRow = select_limit.parentNode.parentNode;
 	
-				for (var limitIndex = select_limit.length - 1; limitIndex >= 0; limitIndex--) {
+				for (var limitIndex = select_limit.length - 1; limitIndex > -1; limitIndex--) {
 					if (ticketsEstimate < nextTicketLimit) {
 						break;
 					}
@@ -498,7 +494,7 @@ var pm_Performances = {
 	
 					var limitedTickets;
 					if (ticketsEstimate > nextTicketLimit) {
-						limitedTickets = nextTicketLimit
+						limitedTickets = nextTicketLimit;
 					} else {
 						limitedTickets = ticketsEstimate;
 					}
@@ -540,10 +536,6 @@ var pm_Performances = {
 	
 	addTicketSalesStatistics: function addTicketSalesStatistics(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_FEATURES_ENABLED)) {
-				return;
-			}
-	
 			if (!pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SALES_STATISTICS)) {
 				return;
 			}
@@ -628,10 +620,6 @@ var pm_Performances = {
 	addSoldTicketsOnShowsPage: 
 	function addSoldTicketsOnShowsPage(aDocument, hasEstimates) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_FEATURES_ENABLED)) {
-				return;
-			}
-	
 			var ticketsPerShowVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_NUMBER_OF_SOLD_TICKETS_PER_UPCOMING_SHOW);
 			var totalTicketsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SOLD_TICKETS); 
 			var totalShowsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SHOWS); 
@@ -665,7 +653,7 @@ var pm_Performances = {
 			var totalEstimatedTickets = 0;
 
 			// Loop through all items.
-			for (var i = nodes.snapshotLength - 1; i >= 0; i--) {
+			for (var i = nodes.snapshotLength - 1; i > -1; i--) {
 				var row = nodes.snapshotItem(i);
 				var cells = row.cells;
 
@@ -783,10 +771,6 @@ var pm_Performances = {
 
 	addSoldTicketsOnSchedulePage: function addSoldTicketsOnSchedulePage(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_FEATURES_ENABLED)) {
-				return;
-			}
-	
 			var ticketsPerShowVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_NUMBER_OF_SOLD_TICKETS_PER_UPCOMING_SHOW);
 			var totalTicketsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SOLD_TICKETS); 
 			var totalShowsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SHOWS); 
@@ -805,7 +789,7 @@ var pm_Performances = {
 			var totalShows = 0;
 			
 			// Loop through all items.
-			for (i = nodes.snapshotLength - 1; i >= 0; i--) {
+			for (i = nodes.snapshotLength - 1; i > -1; i--) {
 				var node = nodes.snapshotItem(i);
 				
 				if (!node.href.match(this.performancesPageRegExp)) {
@@ -864,10 +848,6 @@ var pm_Performances = {
 	addSoldTicketsOnCitiesPage:
 	function addSoldTicketsOnCitiesPage(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_FEATURES_ENABLED)) {
-				return;
-			}
-	
 			var totalTicketsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SOLD_TICKETS); 
 			var totalShowsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SHOWS); 
 
@@ -922,11 +902,7 @@ var pm_Performances = {
 	
 	addTicketSalesTotalOnClubShowsPage: 
 	function addTicketSalesTotalOnClubShowsPage(aDocument) {
-		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_FEATURES_ENABLED)) {
-				return;
-			}
-	
+		try {	
 			var incomePerShowVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_INCOME_PER_SHOW);
 			var totalShowsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SHOWS); 
 			var totalTicketsVisible = pm_Prefs.isEnabled(pm_PrefKeys.PERFORMANCES_SHOW_TOTAL_NUMBER_OF_SOLD_TICKETS); 
@@ -979,7 +955,7 @@ var pm_Performances = {
 				nodes.snapshotLength - 1 : nodes.snapshotLength - 2;
 			 
 			// Loop through all items.
-			for (var i = lastIndex; i >= 0; i = i - 2) {
+			for (var i = lastIndex; i > -1; i = i - 2) {
 				var row = nodes.snapshotItem(i);
 
 				var rowCells = row.cells;
@@ -1061,8 +1037,7 @@ var pm_Performances = {
 								var daysLeft = ((ticketsLimit - ticketsSold) / parsedData.ticketsSoldPerDay).toFixed(1);
 								var percentage = (ticketsSold / ticketsLimit * 100).toFixed(1);
 								
-								pm_Logger.debug('daysLeft='+ daysLeft +', percentage='+ percentage);
-								pm_Logger.debug('alertLimit='+ lowTicketLimitPercentageAlertLimit +', warningLimit='+ lowTicketLimitPercentageWarningLimit);
+								//pm_Logger.debug('daysLeft='+ daysLeft +', percentage='+ percentage);
 								
 								if (daysLeft <= lowTicketLimitDaysLeftAlertLimit ||
 									percentage >= lowTicketLimitPercentageAlertLimit) 
@@ -1207,7 +1182,7 @@ var pm_Performances = {
 				pm_Logger.debug("ticketsSoldPerDay="+ parsedData.ticketsSoldPerDay);
 			}
 			else {
-				pm_Logger.debug("no parsed data");
+				//pm_Logger.debug("no parsed data");
 			}
 			
 			if (salesEstimates && parsedData) {

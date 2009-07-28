@@ -1,6 +1,6 @@
-/*
+/**
  * locales.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -60,17 +60,56 @@
  */
 var pm_Locales = {
 
-	LOCALE_MENUS_XPATH: '/html/body/table[last()]/tbody/tr/td[1]/table/tbody/tr/td/div',
+	LOCALE_MENUS_XPATH: '/html/body/table[last()]/tbody/tr/td[1]/table/tbody',
 	
 	LOCALE_TYPE_AND_QUALITY_REGEXP: /^(.*?): (.*)/i,
 	
+	MENU_NAME_REGEXP: /meny\(['"](.*)['"]\)/,
+	
 	localeTypeIdToImage: new Array(),
 	
-	LOCALE_ICON_ADDED_CLASS_NAME: 'popomungo_localeIconAdded',
+	LOCALE_ICON_ADDED_ATTRIBUTE: '_popomungoLocaleIconAdded',
 
 
-	addLocaleIcons:
-	function addLocaleIcons(doc) {
+	handleEvent: function handleEvent(e) {
+		try {
+			var target = e.target;
+
+			if (!(target instanceof HTMLAnchorElement)) {
+				target = target.parentNode;
+				
+				if (!(target instanceof HTMLAnchorElement)) {
+					return true;
+				}
+			}
+			
+			//pm_Logger.debugObject(e, 'e');
+
+			switch (e.type) {
+			case "click":
+				if (target.hasAttribute("onclick") &&
+					!target.hasAttribute(this.LOCALE_ICON_ADDED_ATTRIBUTE))
+				{
+					target.setAttribute(this.LOCALE_ICON_ADDED_ATTRIBUTE, true);
+					return this.addLocaleIconsOnMenuClickEvent(target);
+				}
+				else {
+					return true;
+				}
+
+			default:
+				pm_Logger.logError("Unexpected event: "+ e.type);
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+		
+		return true;
+	},
+	
+
+	addLocaleIcons: function addLocaleIcons(aDocument) {
 		try {
 			if (!pm_Prefs.isEnabled(pm_PrefKeys.LOCALES_IMAGES_ENABLED)) {
 				return;
@@ -80,54 +119,83 @@ var pm_Locales = {
 				return;				
 			}
 
-			menuNodes = pm_XPathOrderedSnapshot(this.LOCALE_MENUS_XPATH, doc); 
-				
-			pm_Logger.debug('menu nodes='+ menuNodes.snapshotLength);
+			pm_Logger.debug("install click event handler");
+			var node = pm_XPathFirstNode(this.LOCALE_MENUS_XPATH, aDocument);
+			node.addEventListener("click", this, true);
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+	},
+	
 
-			var dataOutOfDate = false;
-			var ignoreMissing = {};
-				
-			for (var i = menuNodes.snapshotLength - 1; i >= 0; i--) {
-				var menuNode = menuNodes.snapshotItem(i);
-				
-				var anchorNodes = menuNode.getElementsByTagName('a');
+	addLocaleIconsOnMenuClickEvent: function addLocaleIconsOnMenuClickEvent(aTarget)
+	{
+		try {
+			var timer1 = new pm_TimerClass();
+			
+			var aDocument = aTarget.ownerDocument; 
 
-				for (var j = anchorNodes.length - 1; j >= 0; j--) {
-					var anchorNode = anchorNodes.item(j);
+			var onClick = aTarget.getAttribute('onclick');
+			var match = onClick.match(pm_Locales.MENU_NAME_REGEXP);
+			
+			if (match && match.length == 2) {
+				var menuName = match[1];
+				var menuNode = aDocument.getElementById(menuName);
+				
+				if (menuNode)
+				{
+					pm_Logger.debug("Adding locale icons to menu="+ menuName);
 					
-					var localeInfo = this.parseLocaleInfoFromLink(anchorNode);
-
-					if (localeInfo) {
-						if (localeInfo.localeTypeId) {								
-							var imgUrl = this.getLocaleIcon(localeInfo.localeTypeId);
-							
-							if (imgUrl) {
-								var img1 = doc.createElement('img');
-								img1.src = imgUrl;
-								img1.className = 'popomungo_locale_icon';
-								
-								anchorNode.insertBefore(img1, anchorNode.firstChild);
+					var anchorNodes = aDocument.getAnchorNodesOnMenu(menuName, menuNode);
+					var ignoreMissing = {};
+					
+					for (var j = anchorNodes.length - 1; j > -1; j--) {
+						var anchorNode = anchorNodes[j];
+						
+						if (!anchorNode.hasAttribute('onclick')) {						
+							var localeInfo = pm_Locales.parseLocaleInfoFromLink(anchorNode);
+			
+							if (localeInfo) {
+								if (localeInfo.localeTypeId) {
+									var imgUrl = pm_Locales.getLocaleIcon(localeInfo.localeTypeId);
+									
+									if (imgUrl) {
+										var img1 = aDocument.createElement('img');
+										img1.src = imgUrl;
+										img1.className = 'popomungo_locale_icon';
+										
+										anchorNode.insertBefore(img1, anchorNode.firstChild);
+									}
+								}
+								else {
+									// Log an error, if the type ID is not available. 
+									if (!ignoreMissing[localeInfo.localeType]) {
+										ignoreMissing[localeInfo.localeType] = true;
+										
+										pm_Logger.logError(
+											"menu("+ menuName +").link("+ j +
+											"): n="+ localeInfo.localeType +
+											": q="+ localeInfo.localeQuality +
+											", a="+ anchorNode);
+									}
+								}
 							}
 						}
 						else {
-							// Log an error, if the type ID is not available. 
-							if (!ignoreMissing[localeInfo.localeType]) {
-								ignoreMissing[localeInfo.localeType] = true;
-								
-								pm_Logger.logError(
-									"menu"+ i +".link"+ j +
-									": n="+ localeInfo.localeType +
-									": q="+ localeInfo.localeQuality +
-									", a="+ anchorNode);
-							}
+							anchorNode.setAttribute(this.LOCALE_ICON_ADDED_ATTRIBUTE, true);
 						}
 					}
 				}
+				
+				pm_Logger.debug("completed: "+ timer1.elapsedTimeStr());
 			}
 		}
 		catch (err) {
 			pm_Logger.logError(err);
 		}
+		
+		return true;
 	},
 	
 
@@ -163,7 +231,7 @@ var pm_Locales = {
 			if (imgUrl == undefined) {
 				var pref = pm_PrefKeys.GetLocaleIconUrlPrefKey(localeTypeId);
 				
-				imgUrl = pm_Prefs.getSetting(pref, "");
+				imgUrl = pm_Prefs.getPref(pref, "");
 				
 				this.localeTypeIdToImage[localeTypeId] = imgUrl;
 			}

@@ -1,6 +1,6 @@
-/*
+/**
  * charts.js
- * Copyright © 2007, 2008 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -29,8 +29,8 @@ var pm_Charts = {
 	cityIdToName: {},
 	cityNameToId: {},
 	
-	localesLangId: undefined,
-	citiesLangId: undefined,
+	localesLangId: 0,
+	citiesLangId: 0,
 
 
 	PrepareLocales:
