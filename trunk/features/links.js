@@ -1,6 +1,6 @@
-/*
+/**
  * links.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -22,12 +22,8 @@ var pm_Links = {
 	VISIBLE_TEXT_LINK: 1,
 	VISIBLE_ICON_LINK: 2,
 
-	localePageRegExp: /\/locale\.asp/i,
-	localeViewRegExp: /([?&]action=)view[&]/i,
 	localeIdRegExp: /[?&]localeid=(\d+)/i,
 
-	characterPageRegExp: /\/characterdetails\.asp/i,
-	characterViewRegExp: /([?&]action=)view[&]/i,
 	characterIdRegExp: /characterid=(\d+)/i,
 	
 	MOVE_HERE_ICON_URL: chrome.extension.getURL("skin/icons/silk/door_in.png"),
@@ -40,44 +36,91 @@ var pm_Links = {
 	
 	ARROW_ICON_URL: chrome.extension.getURL("skin/icons/silk/bullet_go.png"),	
        
+	LOCALE_MENUS_XPATH: '/html/body/table[last()]/tbody/tr/td[1]/table/tbody',
+	
+	LINKS_ADDED_ATTRIBUTE: '_popomungoLinksAdded',
+
+	moveHereAbbrevText: null,
+	viewCharactersAbbrevText: null,
+	callCharAbbrevText: null,
+	sendMsgAbbrevText: null,
+
+	moveHereText: null,
+	viewCharactersText: null,
+	callCharText: null,
+	sendMsgText: null,
+
+	callLinkEnabled: false,
+	messageLinkEnabled: false,
+	moveHereLinkEnabled: false,
+	viewCharactersLinkEnabled: false,
+	localeIconLinksEnabled: false,
+	iconLinksEnabled: false,
+	textLinksEnabled: false,
+	textStyle: '',
+	
+
+	handleEvent: function handleEvent(e) {
+		try {
+			var target = e.target;
+
+			if (!(target instanceof HTMLAnchorElement)) {
+				target = target.parentNode;
+				
+				if (!(target instanceof HTMLAnchorElement)) {
+					return true;
+				}
+			}
+			
+			//pm_Logger.debugObject(e, 'e');
+
+			switch (e.type) {
+			case "click":
+				if (target.hasAttribute("onclick"))
+				{
+					if (!target.hasAttribute(this.LINKS_ADDED_ATTRIBUTE)) {
+						target.setAttribute(this.LINKS_ADDED_ATTRIBUTE, true);
+						return this.addVisibleLinksOnMenuClickEvent(target);
+					}
+				}
+				break;
+
+			default:
+				pm_Logger.logError("Unexpected event: "+ e.type);
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+		
+		return true;
+	},
+	
+
+	addEventHandlerOnCityPage: function addEventHandlerOnCityPage(aDocument) {
+		try {
+			this._processLinks_popupLinks(aDocument);
+
+			var localeVisibleLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_VISIBLE_LINKS_ENABLED);
+
+			if (localeVisibleLinksEnabled) {
+				this._prepareVisibleLinks(aDocument);
+				
+				pm_Logger.debug("install click event handler");
+				var node = pm_XPathFirstNode(this.LOCALE_MENUS_XPATH, aDocument);
+				node.addEventListener("click", this, true);
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+	},
+	
+	
 	processLinks: function processLinks(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.LINKS_FEATURES_ENABLED)) {
-				return;
-			}
-			
-			var popupLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_POPUP_ENABLED);
-			var visibleLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_VISIBLE_LINKS_ENABLED);
-			
-			if (popupLinksEnabled) {
-				var charPopupLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_POPUP_ENABLED); 
-				var localePopupLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_POPUP_ENABLED);
-	
-				if (charPopupLinksEnabled || localePopupLinksEnabled) 
-				{
-					this.addPopupLinkMenus(
-						aDocument, 
-						charPopupLinksEnabled, 
-						localePopupLinksEnabled);
-				}
-			}
-			
-			if (visibleLinksEnabled) {
-				var charVisibleLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_VISIBLE_LINKS_ENABLED); 
-				var localeVisibleLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_VISIBLE_LINKS_ENABLED);
-	
-				if (charVisibleLinksEnabled || localeVisibleLinksEnabled) 
-				{
-					var visibleLinkType = pm_Prefs.getSetting(pm_PrefKeys.LINKS_VISIBLE_LINK_TYPE, pm_Links.VISIBLE_ICON_LINK);
-	
-					this.addTextLinks(
-						aDocument, 
-						charVisibleLinksEnabled, 
-						localeVisibleLinksEnabled,
-						visibleLinkType);
-				}
-			}
-			
+			this._processLinks_popupLinks(aDocument);
+			this._processLinks_visibleLinks(aDocument);
 		}
 		catch (err) {
 			pm_Logger.logError(err);
@@ -85,50 +128,52 @@ var pm_Links = {
 	},
 
 
-	addTextLinks: function addTextLinks(
-		aDocument, charLinksEnabled, localeLinksEnabled, linkType) 
+	_processLinks_popupLinks: function _processLinks_popupLinks(aDocument) {
+		try {
+			var charPopupLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_POPUP_ENABLED); 
+			var localePopupLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_POPUP_ENABLED);
+		
+			if (charPopupLinksEnabled || localePopupLinksEnabled) 
+			{
+				pm_LinkMenu.appendPopupMenu(aDocument);
+		
+				pm_Logger.debug("install mouseover, mouseout & click event handler");
+				var elem = aDocument.body;
+				elem.addEventListener('mouseover', pm_LinkMenu, true);
+				elem.addEventListener('mouseout', pm_LinkMenu, true);
+				elem.addEventListener('click', pm_LinkMenu, true);
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+	},	
+
+
+	_processLinks_visibleLinks: function _processLinks_visibleLinks(aDocument) {
+		try {
+			var charVisibleLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_VISIBLE_LINKS_ENABLED); 
+			var localeVisibleLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_VISIBLE_LINKS_ENABLED);
+		
+			if (charVisibleLinksEnabled || localeVisibleLinksEnabled) 
+			{
+				this.addVisibleLinks(
+					aDocument, 
+					charVisibleLinksEnabled, 
+					localeVisibleLinksEnabled);
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+	},	
+
+	
+	addVisibleLinks: function addVisibleLinks(aDocument, charLinksEnabled, localeLinksEnabled) 
 	{
 		try {
-			var callLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_VISIBLE_CALL_LINK_ENABLED);
-			var messageLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_VISIBLE_MESSAGE_LINK_ENABLED);
-			var moveHereLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_VISIBLE_GOTO_LINK_ENABLED);
-			var viewCharactersLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_VISIBLE_VIEW_CHARACTERS_ENABLED);
-
-			if (!(callLinkEnabled || messageLinkEnabled || 
-				moveHereLinkEnabled || viewCharactersLinkEnabled)) 
-			{
+			if (!this._prepareVisibleLinks(aDocument))
 				return;
-			}
-
-			// Link type.
-			var localeIconLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LOCALES_IMAGES_ENABLED);
-			var iconLinksEnabled = (linkType == pm_Links.VISIBLE_ICON_LINK);
-			var textLinksEnabled = !iconLinksEnabled; // default
-
-			var textStyle;
-
-			if (textLinksEnabled) {
-				var textColor = pm_Prefs.getSetting(pm_PrefKeys.LINKS_VISIBLE_LINK_TEXT_COLOR, "#000000");
-				var backgroundColor = pm_Prefs.getSetting(pm_PrefKeys.LINKS_VISIBLE_LINK_BG_COLOR, "#CCCCFF");
-				textStyle = 'color: '+ textColor +'; background-color: '+ backgroundColor +';';			
-			}
-			
-			if (iconLinksEnabled && 
-				localeIconLinksEnabled)
-			{
-				pm_Charts.PrepareLocales(aDocument);
-			}
-
-			// Get the strings.								
-			var moveHereAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_MOVE_HERE_ABBREV, null);
-			var viewCharactersAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS_ABBREV, null);
-			var callCharAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_CALL_ABBREV, null);
-			var sendMsgAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_SEND_MESSAGE_ABBREV, null);
-
-			var moveHereText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_MOVE_HERE, null);
-			var viewCharactersText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS, null);
-			var callCharText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_CALL, null);
-			var sendMsgText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_SEND_MESSAGE, null);
 			
 			// Loop through all anchor nodes.
 			var anchorNodes = aDocument.getElementsByTagName('a');
@@ -136,8 +181,8 @@ var pm_Links = {
 		
 			var ownCharId = pm_UserSettings.getCharacterId(aDocument);
 
-			for (var i=anchorNodes.length - 1; i >= 0; i--) {
-				var anchorNode = anchorNodes.item(i);
+			for (var i = anchorNodes.length - 1; i > -1; i--) {
+				var anchorNode = anchorNodes[i];
 				
 				//pm_Logger.debug(i +': path='+ anchorNode.pathname + ', search='+ anchorNode.search);
 
@@ -153,216 +198,282 @@ var pm_Links = {
 					continue;
 				}
 
-				if (anchorNode.pathname.match(this.localePageRegExp)) {
-					if (localeLinksEnabled)
-					{
-						var idMatch = anchorNode.search.match(this.localeIdRegExp);
+				var pathname = anchorNode.pathname.toLowerCase();
+				var search = anchorNode.search.toLowerCase();
+				
+				if (localeLinksEnabled && 
+					this._addVisibleLinks_localeLinks(
+						aDocument, anchorNode, pathname, search)) 
+				{ //void	
+				}
+				else if (charLinksEnabled &&
+					this._addVisibleLinks_characterLinks(
+						aDocument, anchorNode, pathname, search, ownCharId))
+				{ // void
+				}
+				
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+	},
+	
 
-						if (idMatch)
-						{
-							if (moveHereLinkEnabled) {
-								var node1;
-								
-								if (iconLinksEnabled) {
-									/* 
-									 * If we have an image inside the link
-									 * take it out and put the link on it.
-									 */									
-									node1 = anchorNode.getElementsByTagName("img")[0];
-									
-									if (node1) {
-										anchorNode.removeChild(node1);
-									}
-									else {
-										node1 = this.getIconNode(aDocument, pm_Links.MOVE_HERE_ICON_URL);
-									}									
-								}
-								else {
-									node1 = aDocument.createElement('span');
-									node1.className = 'popomungo_text_link';
-									node1.setAttribute('style', textStyle);
-									node1.appendChild(aDocument.createTextNode(moveHereAbbrevText));
-								}
+	_prepareVisibleLinks: function _prepareVisibleLinks(aDocument) {
+		this._getVisibleLinksPrefs();
+		
+		if (!(this.callLinkEnabled || 
+			this.messageLinkEnabled || 
+			this.moveHereLinkEnabled || 
+			this.viewCharactersLinkEnabled)) 
+		{
+			return false;
+		}
+
+		this._getVisibleLinksStrings();
+		
+		if (this.iconLinksEnabled && 
+			this.localeIconLinksEnabled)
+		{
+			pm_Charts.PrepareLocales(aDocument);
+		}
+
+		return true;
+	},
+	
+	
+	_getVisibleLinksPrefs: function _getVisibleLinksPrefs() {
+		this.callLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_VISIBLE_CALL_LINK_ENABLED);
+		this.messageLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_CHARACTER_VISIBLE_MESSAGE_LINK_ENABLED);
+		this.moveHereLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_VISIBLE_GOTO_LINK_ENABLED);
+		this.viewCharactersLinkEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LINKS_LOCALE_VISIBLE_VIEW_CHARACTERS_ENABLED);
+
+		// Link type.
+		this.localeIconLinksEnabled = pm_Prefs.isEnabled(pm_PrefKeys.LOCALES_IMAGES_ENABLED);
+		var visibleLinkType = pm_Prefs.getPref(pm_PrefKeys.LINKS_VISIBLE_LINK_TYPE, this.VISIBLE_TEXT_LINK);
+		this.iconLinksEnabled = (visibleLinkType == this.VISIBLE_ICON_LINK);
+		this.textLinksEnabled = !this.iconLinksEnabled; // default
+
+		if (this.textLinksEnabled) {
+			var textColor = pm_Prefs.getPref(pm_PrefKeys.LINKS_VISIBLE_LINK_TEXT_COLOR, "#000000");
+			var backgroundColor = pm_Prefs.getPref(pm_PrefKeys.LINKS_VISIBLE_LINK_BG_COLOR, "#CCCCFF");
+			this.textStyle = 'color: '+ textColor +'; background-color: '+ backgroundColor +';';			
+		}
+	},
+
+	
+	_getVisibleLinksStrings: function _getVisibleLinksStrings() {
+		// Get the strings.								
+		this.moveHereAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_MOVE_HERE_ABBREV, null);
+		this.viewCharactersAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS_ABBREV, null);
+		this.callCharAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_CALL_ABBREV, null);
+		this.sendMsgAbbrevText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_SEND_MESSAGE_ABBREV, null);
+
+		this.moveHereText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_MOVE_HERE, null);
+		this.viewCharactersText = pm_Strings.getString(pm_StringKeys.LINKS_LOCALES_VIEW_CHARACTERS, null);
+		this.callCharText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_CALL, null);
+		this.sendMsgText = pm_Strings.getString(pm_StringKeys.LINKS_CHARACTERS_SEND_MESSAGE, null);
+	},
+	
+	
+	_addVisibleLinks_localeLinks: function _addVisibleLinks_localeLinks(
+			aDocument, anchorNode, pathname, search)
+	{
+		if (pathname.indexOf('/locale.asp') > -1 &&
+			search.indexOf('action=view&') > -1)
+		{
+			idMatch = search.match(this.localeIdRegExp);
+
+			if (idMatch)
+			{
+				if (this.moveHereLinkEnabled) {
+					if (this.iconLinksEnabled) {
+						/* 
+						 * If we have an image inside the link
+						 * take it out and put the link on it.
+						 */									
+						node1 = anchorNode.getElementsByTagName('img')[0];
+						
+						if (node1) {
+							anchorNode.removeChild(node1);
+						}
+						else {
+							node1 = this.getIconNode(aDocument, this.MOVE_HERE_ICON_URL);
+						}									
+					}
+					else {
+						node1 = aDocument.createElement('span');
+						node1.className = 'popomungo_text_link';
+						node1.setAttribute('style', this.textStyle);
+						node1.appendChild(aDocument.createTextNode(this.moveHereAbbrevText));
+					}
+		
+					anchor1 = aDocument.createElement('a');
+					anchor1.href = anchorNode.href;
+					anchor1.search = '?action=MoveHere&LocaleID='+ idMatch[1];
+					anchor1.title = this.moveHereText;
+					anchor1.appendChild(node1);
+
+					anchorNode.parentNode.insertBefore(anchor1, anchorNode);
+				}
+
+				// View characters
+				if (this.viewCharactersLinkEnabled) {
+					if (this.iconLinksEnabled) {
+						/* 
+						 * If we have an image inside the link
+						 * take it out and put the link on it.
+						 */									
+						node1 = anchorNode.getElementsByTagName('img')[0];
+						
+						if (node1) {
+							anchorNode.removeChild(node1);
+						}
+						else {
+							node1 = this.getIconNode(aDocument, this.VIEW_CHARACTERS_ICON_URL);
+						}									
+					}
+					else {
+						node1 = aDocument.createElement('span');
+						node1.className = 'popomungo_text_link';
+						node1.setAttribute('style', this.textStyle);
+						node1.appendChild(aDocument.createTextNode(this.viewCharactersAbbrevText));
+					}
 					
-								anchor1 = pm_CreateAnchor(aDocument, anchorNode.href, node1);
-								anchor1.search = '?action=MoveHere&LocaleID='+ idMatch[1];
-								anchor1.title = moveHereText;
-		
-								anchorNode.parentNode.insertBefore(anchor1, anchorNode);
-							}
+					anchor1 = aDocument.createElement('a');
+					anchor1.href = anchorNode.href;
+					anchor1.search = '?action=ViewCharacters&LocaleID='+ idMatch[1];
+					anchor1.title = this.viewCharactersText;
+					anchor1.appendChild(node1);
 
-							// View characters
-							if (viewCharactersLinkEnabled) {
-								var node1;
-
-								if (iconLinksEnabled) {
-									/* 
-									 * If we have an image inside the link
-									 * take it out and put the link on it.
-									 */									
-									node1 = anchorNode.getElementsByTagName("img")[0];
-									
-									if (node1) {
-										anchorNode.removeChild(node1);
-									}
-									else {
-										node1 = this.getIconNode(aDocument, pm_Links.VIEW_CHARACTERS_ICON_URL);
-									}									
-								}
-								else {
-									node1 = aDocument.createElement('span');
-									node1.className = 'popomungo_text_link';
-									node1.setAttribute('style', textStyle);
-									node1.appendChild(aDocument.createTextNode(viewCharactersAbbrevText));
-								}
-								
-								anchor1 = pm_CreateAnchor(aDocument, anchorNode.href, node1);
-								anchor1.search = '?action=ViewCharacters&LocaleID='+ idMatch[1];
-								anchor1.title = viewCharactersText;
-		
-								anchorNode.parentNode.insertBefore(anchor1, anchorNode);
-							}
-						}
-					}
-				}
-				else if (anchorNode.pathname.match(this.characterPageRegExp)) {
-					if (charLinksEnabled &&
-						anchorNode.search.match(this.characterViewRegExp)) 
-					{
-						var idMatch = anchorNode.search.match(this.characterIdRegExp);
-
-						if (idMatch) {
-							var charId = idMatch[1];
-							
-							if (charId != ownCharId) {
-
-								// Call
-								if (callLinkEnabled) {
-									var node1;
-						
-									if (iconLinksEnabled) {
-										node1 = aDocument.createElement('img');
-										node1.src = pm_Links.CALL_CHARACTER_ICON_URL;
-										node1.className = 'popomungo_icon_link';
-									}
-									else {
-										node1 = aDocument.createElement('span');
-										node1.className = 'popomungo_text_link';
-										node1.setAttribute('style', textStyle);
-										node1.appendChild(aDocument.createTextNode(callCharAbbrevText));
-									}
-							
-									var href1 = anchorNode.href.replace(pm_Links.characterPageRegExp, '/Interact.asp');
-									href1 = href1.replace(pm_Links.characterViewRegExp, '$1PhoneInteract&');
-									var anchor1 = pm_CreateAnchor(aDocument, href1, node1);
-									anchor1.title = callCharText;
-						
-									anchorNode.parentNode.insertBefore(anchor1, anchorNode);
-								}
-
-								// Send Message
-								if (messageLinkEnabled) {
-									var node1;
-
-									if (iconLinksEnabled) {
-										node1 = aDocument.createElement('img');
-										node1.src = pm_Links.SEND_MESSAGE_ICON_URL;
-										node1.className = 'popomungo_icon_link';
-									}
-									else {
-										node1 = aDocument.createElement('span');
-										node1.className = 'popomungo_text_link';
-										node1.setAttribute('style', textStyle);
-										node1.appendChild(aDocument.createTextNode(sendMsgAbbrevText));
-									}
-							
-									var href1 = anchorNode.href.replace(pm_Links.characterViewRegExp, '$1SendMessage&');
-									var anchor1 = pm_CreateAnchor(aDocument, href1, node1);
-									anchor1.title = sendMsgText;
-						
-									anchorNode.parentNode.insertBefore(anchor1, anchorNode);
-								}
-				
-							}
-						}
-					}
+					anchorNode.parentNode.insertBefore(anchor1, anchorNode);
 				}
 			}
+			
+			return true;
 		}
-		catch (err) {
-			pm_Logger.logError(err);
-		}
-	},
-	
 
-	addPopupLinkMenus: function addPopupLinkMenus(
-		aDocument, charLinksEnabled, localeLinksEnabled) 
+		return false;
+	},
+
+
+	_addVisibleLinks_characterLinks: function _addVisibleLinks_characterLinks(
+			aDocument, anchorNode, pathname, search, ownCharId) 
 	{
-		try {
-			pm_LinkMenu.appendPopupMenu(aDocument);
-			//this.appendMenuHandle(aDocument);
+		if (pathname.indexOf('/characterdetails.asp') > -1 &&
+			search.indexOf('action=view&') > -1)
+		{
+			idMatch = search.match(this.characterIdRegExp);
 
-			// Loop through all anchor nodes.
-			var anchorNodes = aDocument.getElementsByTagName('a');
-			pm_Logger.debug('anchorNodes='+ anchorNodes.length);
-		
-			var ownCharId = pm_UserSettings.getCharacterId(aDocument);
-
-			for (var i=anchorNodes.length - 1; i>=0; i--) {
-				var anchorNode = anchorNodes.item(i);
+			if (idMatch) {
+				var charId = idMatch[1];
 				
-				//pm_Logger.debug(i +': path='+ anchorNode.pathname + ', search='+ anchorNode.search);
+				if (charId != ownCharId) {
 
-				try {
-					if (!anchorNode.href || 
-						!anchorNode.pathname) {
-						//pm_Logger.debug(i +': No href/path, link skipped.');
-						continue;
-					}
-				}
-				catch (err) {
-					// Invalid or missing href...
-					continue;
-				}
-
-				if (anchorNode.pathname.match(this.localePageRegExp)) {
-					if (localeLinksEnabled)
-					{
-						var idMatch = anchorNode.search.match(this.localeIdRegExp);
-						
-						if (idMatch)
-						{
-							anchorNode.addEventListener('mouseover', pm_LinkMenu.mouseOverLocaleLink, true);
-							anchorNode.addEventListener('mouseout', pm_LinkMenu.mouseOutLocaleLink, true);
-							anchorNode.addEventListener('click', pm_LinkMenu.hideLinkMenu, true);
+					// Call
+					if (this.callLinkEnabled) {
+						if (this.iconLinksEnabled) {
+							node1 = aDocument.createElement('img');
+							node1.src = this.CALL_CHARACTER_ICON_URL;
+							node1.className = 'popomungo_icon_link';
 						}
+						else {
+							node1 = aDocument.createElement('span');
+							node1.className = 'popomungo_text_link';
+							node1.setAttribute('style', this.textStyle);
+							node1.appendChild(aDocument.createTextNode(this.callCharAbbrevText));
+						}
+				
+						anchor1 = aDocument.createElement('a');
+						anchor1.href = anchorNode.href;
+						anchor1.pathname = '/Common/Interact.asp';
+						anchor1.search = '?action=PhoneInteract&CharacterID='+ charId;
+						anchor1.title = this.callCharText;
+						anchor1.appendChild(node1);
+			
+						anchorNode.parentNode.insertBefore(anchor1, anchorNode);
 					}
-				}
-				else if (anchorNode.pathname.match(this.characterPageRegExp)) {
-					if (charLinksEnabled &&
-						anchorNode.search.match(this.characterViewRegExp)) 
-					{
-						var idMatch = anchorNode.search.match(this.characterIdRegExp);
 
-						if (idMatch) {
-							var charId = idMatch[1];
-							
-							if (charId != ownCharId) {
-								anchorNode.addEventListener('mouseover', pm_LinkMenu.mouseOverCharacterLink, true);
-								anchorNode.addEventListener('mouseout', pm_LinkMenu.mouseOutCharacterLink, true);
-								anchorNode.addEventListener('click', pm_LinkMenu.hideLinkMenu, true);
-							}
+					// Send Message
+					if (this.messageLinkEnabled) {
+						if (this.iconLinksEnabled) {
+							node1 = aDocument.createElement('img');
+							node1.src = this.SEND_MESSAGE_ICON_URL;
+							node1.className = 'popomungo_icon_link';
+						}
+						else {
+							node1 = aDocument.createElement('span');
+							node1.className = 'popomungo_text_link';
+							node1.setAttribute('style', this.textStyle);
+							node1.appendChild(aDocument.createTextNode(this.sendMsgAbbrevText));
+						}
+				
+						anchor1 = aDocument.createElement('a');
+						anchor1.href = anchorNode.href;
+						anchor1.search = '?action=SendMessage&CharacterID='+ charId;
+						anchor1.title = this.sendMsgText;
+						anchor1.appendChild(node1);
+			
+						anchorNode.parentNode.insertBefore(anchor1, anchorNode);
+					}
+	
+				}
+			}
+			
+			return true;
+		}
+
+		return false;
+	},
+	
+	
+	addVisibleLinksOnMenuClickEvent: function addVisibleLinksOnMenuClickEvent(aTarget) {
+		try {
+			var timer1 = new pm_TimerClass();
+			
+			var aDocument = aTarget.ownerDocument; 
+
+			var onClick = aTarget.getAttribute('onclick');
+			var match = onClick.match(pm_Locales.MENU_NAME_REGEXP);
+			
+			if (match && match.length == 2) {
+				var menuName = match[1];
+				var menuNode = aDocument.getElementById(menuName);
+				
+				if (menuNode)
+				{
+					pm_Logger.debug('Adding visible links to menu='+ menuName);
+					
+					var anchorNodes = aDocument.getAnchorNodesOnMenu(menuName, menuNode);
+
+					for (var j = anchorNodes.length - 1; j > -1; j--)
+					{
+						var anchorNode = anchorNodes[j];
+						
+						if (!anchorNode.hasAttribute('onclick')) {
+							var pathname = anchorNode.pathname.toLowerCase();
+							var search = anchorNode.search.toLowerCase();
+	
+							this._addVisibleLinks_localeLinks(aDocument, anchorNode, pathname, search);
+						}
+						else {
+							anchorNode.setAttribute(this.LINKS_ADDED_ATTRIBUTE, true);
 						}
 					}
 				}
 			}
+
+			pm_Logger.debug("completed: "+ timer1.elapsedTimeStr());
 		}
 		catch (err) {
 			pm_Logger.logError(err);
 		}
+
+		return true;
 	},
 	
-	
+
 	getIconNode: function getIconNode(aDocument, aIconSrc) {
 		try {
 			imgNode = aDocument.createElement('img');

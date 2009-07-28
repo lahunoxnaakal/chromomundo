@@ -1,6 +1,6 @@
 /*
  * competitions.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -41,12 +41,10 @@ var pm_Competitions = {
 	 */
 	colorizeCompetitionEntries: function colorizeCompetitionEntries(doc)
 	{
-		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.HIGHLIGHTING_FEATURES_ENABLED)) {
-				return;
-			}
-			
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.COMPETITIONS_COLOR_ENTRIES)) {
+		try
+		{
+			if (!pm_Prefs.isEnabled(pm_PrefKeys.COMPETITIONS_COLOR_ENTRIES))
+			{
 				return;
 			}
 			
@@ -60,56 +58,80 @@ var pm_Competitions = {
 			
 			var rows = table.getElementsByTagName('tr');
 		
-			for (var i=0; i<rows.length; i++) {
-				var row = rows.item(i);
+			for (var i = 0, row; row = rows[i]; i++)
+			{
 				var tableCells = row.cells;
 				var td3 = tableCells.item(2);
 		
-				if (td3.innerHTML.match(regexp1)) {
+				if (td3.innerHTML.match(regexp1))
+				{
 					pm_Logger.debug('Open show');
-					if (row.bgColor) {
+					
+					if (row.bgColor)
+					{
 						row.bgColor = '#ffc0c0';
-					} else {
+					}
+					else
+					{
 						row.bgColor = '#ffd0d0';
 					}
 				}
-				else if (td3.innerHTML.match(regexp2)) {
+				else if (td3.innerHTML.match(regexp2)) 
+				{
 					pm_Logger.debug('Open booking');
-					if (row.bgColor) {
+					
+					if (row.bgColor)
+					{
 						row.bgColor = '#f7f7f7'; //'#ffd0b0';
-					} else {
+					}
+					else
+					{
 						row.bgColor = '#ffffff'; //'#ffe0c0';
 					}
 				}
-				else if (td3.innerHTML.match(regexp3)) {
+				else if (td3.innerHTML.match(regexp3))
+				{
 					pm_Logger.debug('Invited');
-					if (row.bgColor) {
+					
+					if (row.bgColor)
+					{
 						row.bgColor = '#ffffc0';
-					} else {
+					}
+					else
+					{
 						row.bgColor = '#ffffd0';
 					}
 				}
-				else {
+				else 
+				{
 					pm_Logger.debug('Booked');
-					if (row.bgColor) {
+					
+					if (row.bgColor)
+					{
 						row.bgColor = '#c0ffc0';
-					} else {
+					}
+					else
+					{
 						row.bgColor = '#d0ffd0';
 					}
 				}
 			}
 		}
-		catch (err) {
+		catch (err) 
+		{
 			pm_Logger.logError(err);
 		}
 	},
 	
 	MakeCompetitionsInvitesVisible:
-	function MakeCompetitionsInvitesVisible(doc) {
-		try {
+	function MakeCompetitionsInvitesVisible(doc)
+	{
+		try
+		{
 			var nodes = pm_XPathOrderedSnapshot(this.COMPETITION_LINK_ON_INVITATION_XPATH, doc);
 		}
-		catch (err) {
+		catch (err)
+		{
 			pm_Logger.logError(err);
 		}
 	}

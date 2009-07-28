@@ -1,25 +1,20 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="styles.css">
-<script>
-var bmname = "http://chromomungo.org/settings/";
-var bmparentname = "Chromomungo Settings";
+<script type="text/javascript" src="core/savelib.js"></script>
+<script type="text/javascript"> 
 var pollInterval = 1000 * 30;  // 30 secondi
 var cm_UserPreferences = { };
-var bm_ParentID = -1;
 var cm_Port = undefined;
 var cm_CanSendSettings = false;
 	
 function init() 
 {
-    console.log("Initialize...");
-    getParentBM();
-    //window.setTimeout(refreshPreferences, 0);
+    console.log("Initialize...");      
+    fillDictionary(false);    
+    chrome.self.onConnect.addListener(onPortConnect);    
     
-    chrome.self.onConnect.addListener(onPortConnect);
-    chrome.bookmarks.onAdded.addListener(onBookmarkAdded);
-    chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
-    chrome.bookmarks.onChanged.addListener(onBookmarkChanged);
+    scheduleRequest();
 }
 
 function scheduleRequest() 
@@ -34,125 +29,24 @@ function refreshPreferences()
 }
 
 function fillDictionary(doSendPrefs)
-{   
-    if ( bm_ParentID == -1 )
-    {
-        cm_CanSendSettings = false;
-        return;
-    }
-     
-    chrome.bookmarks.getChildren(bm_ParentID, function(results)
-    {
-        console.log("Found " + results.length + " settings.");
-		cm_CanSendSettings = true;
-        for (var i = 0; i < results.length; i++) 
-        {
-            var sKey = results[i].title;
-            var sValue = results[i].url;
-            sValue = sValue.substring(bmname.length);
-            cm_UserPreferences[sKey] = sValue;                       
-        }                
-        
-        if ( doSendPrefs == true )
-        {
-            sendPreferences();
-        }
-    });
-}
-
-function getParentBM()
-{    
-    chrome.bookmarks.getChildren(1, function(results) {
-        console.log("Found " + results.length + " matches");
-        var bmfound = false;
-        for (var i = 0; i < results.length; i++) 
-        {
-            if (results[i].title == bmparentname) 
-            {
-                bmfound = true;
-                bm_ParentID = results[i].id        
-                console.log("Found bm_ParentID: " + bm_ParentID + " i=" + i);  
-            }
-        }        
-        if ( bmfound == false )
-        {
-            createParentBM();
-        }
-    });
-}
-
-function createParentBM()
 {
-   if ( bm_ParentID != -1 )
-    return;
-    
-   chrome.bookmarks.create({
-        'parentId': 1,
-        'title': bmparentname,
-        'url': undefined}, function(newbookmark) 
-        {       
-            console.log("bm_ParentID: " + newbookmark.id);
-            bm_ParentID = newbookmark.id;   
-			setValue("enabled", "true");
-        }  
-   );  
+    cm_UserPreferences = cm_SaveLib.getNameValueCollection();
+    cm_CanSendSettings = true;
+    if ( doSendPrefs == true )
+    {
+        sendPreferences();
+    }    
 }
 
 function setValue(sKey, oValue)
 {
-   if ( bm_ParentID == -1 )
-    return;
-    
-   chrome.bookmarks.search(sKey, function(result)
-   {
-        var sNewUrl = bmname + oValue;
-        
-        if ( result.length == 1 )
-        {            
-            if ( sNewUrl != result[0].url )
-            {
-                // update settings
-                // does not work :D HACK with REMOVE + Add Again
-                /*
-                chrome.bookmarks.update(
-                    result[0].id, 
-                    { 'url': sNewUrl }, function(newbookmark) 
-                    {
-                        console.log("Updated settings: " + newbookmark.title);
-                    }
-                );   */               
-                console.log("Removing old setting: " + result[0].title);
-                chrome.bookmarks.remove(result[0].id, function()
-                    {
-                        setValue(sKey, oValue);
-                    }
-                );
-            }
-        }
-        else if ( result.length == 0 )
-        {
-           chrome.bookmarks.create({
-                'parentId': bm_ParentID,
-                'title': sKey,
-                'url': sNewUrl}, function(newbookmark) 
-                {
-                    console.log("Created new settings: " + newbookmark.title);
-                }  
-           );             
-        }
-        else
-        {
-            console.log("ERROR: multiple settings with the same key: " + sKey);
-        }
-   });
-   
+    cm_SaveLib.saveData(sKey, oValue);
 }
 
 function onPortConnect(port) 
 {
       cm_Port = port;
-      port.onMessage.addListener(onMessageReceived)
-      //port.postMessage({message: "Greetings, tab " + port.tab.id, values: [true,false,null]});
+      cm_Port.onMessage.addListener(onMessageReceived)      
 };    
 
 function onMessageReceived(data)
@@ -182,27 +76,9 @@ function onMessageReceived(data)
 function sendPreferences()
 {
     if ( cm_Port != undefined && cm_CanSendSettings )
-    {
-        cm_Port.postMessage({message: "Hello!", values: cm_UserPreferences});
+    {        
+        cm_Port.postMessage({message: "Hello!", values: cm_UserPreferences});        
     }
-}
-
-function onBookmarkChanged(id, changedProps)
-{
-    console.log("Changed bookmark. id = " + id + "changes: " + changedProps);
-    fillDictionary(false);
-}
-
-function onBookmarkAdded(id, node)
-{
-    console.log("Added bookmark. id = " + id + "title: " + node.title);
-    fillDictionary(false);
-}
-
-function onBookmarkRemoved(id, data)
-{
-    console.log("Removed bookmark. id = " + id + "parentID = " + data.parentId );
-    fillDictionary(false);
 }
 
 </script>

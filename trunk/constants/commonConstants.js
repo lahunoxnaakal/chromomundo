@@ -1,6 +1,6 @@
-/*
+/**
  * commonConstants.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *

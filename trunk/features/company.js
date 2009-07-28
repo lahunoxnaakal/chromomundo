@@ -1,6 +1,6 @@
 /*
  * company.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -25,10 +25,6 @@ var pm_Company = {
 
 	highlightCeoLocale: function highlightCeoLocale(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.HIGHLIGHTING_FEATURES_ENABLED)) {
-				return;
-			}
-	
 			var highlightLocale = pm_Prefs.isEnabled(pm_PrefKeys.HIGHLIGHTING_CEO_LOCALE_ENABLED); 
 
 			if (!(highlightLocale)) {
@@ -41,9 +37,7 @@ var pm_Company = {
 			pm_Logger.debug('CEO company='+ ceoCompanyId +
 				', nodes='+ nodes.length);
 
-			for (var i = nodes.length - 1; i >= 0; i--) {
-				var node = nodes[i];
-				
+			for (var i = 0, node; node = nodes[i]; i++) {
 				var res = node.href.match(this.localeIdRegExp);
 
 				//pm_Logger.debug(i +': res='+ res +', href='+ node.href);

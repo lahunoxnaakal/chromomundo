@@ -1,6 +1,6 @@
-/*
+/**
  * progressBars.js
- * Copyright (c) 2007, 2008 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -50,14 +50,16 @@ var pm_ProgressBars = {
 	WITH_MINUS_SIGN_REGEXP: /(\-?\d+%?)/,
 	
 	WITH_DECIMALS_REGEXP: /(\d+[.,]?\d*%?)/,
+	
 		
-
+	/**
+	 * Add the image value as text overlay on the images.
+	 * 
+	 * @param {Document} aDocument 
+	 * @param {RegExp} aTitleRegexp 
+	 */
 	addTextOverStats: function addTextOverStats(aDocument, aTitleRegexp) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_FEATURES_ENABLED)) {
-				return;
-			}
-
 			if (!pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_SHOW_PROGRESSBAR_VALUES)) {
 				return;
 			}
@@ -68,7 +70,7 @@ var pm_ProgressBars = {
 	
 			pm_Logger.debug('images='+ xpResult.snapshotLength);
 
-			for (var i = xpResult.snapshotLength - 1; i >= 0; i--) {
+			for (var i = xpResult.snapshotLength - 1; i > -1; i--) {
 				var img1 = xpResult.snapshotItem(i);
 				
 				if (!img1.src.match(this.barImgRegexp)) {
@@ -105,10 +107,6 @@ var pm_ProgressBars = {
 
 	addTextOverTicketSalesBars: function addTextOverTicketSalesBars(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_FEATURES_ENABLED)) {
-				return;
-			}
-
 			var addSoldTickets = pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_ADD_SOLD_TICKETS_COUNT);
 			var addSoldTicketsPercent = pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_ADD_SOLD_TICKETS_PERCENTAGE);
 
@@ -121,7 +119,7 @@ var pm_ProgressBars = {
 	
 			pm_Logger.debug('images='+ xpResult.snapshotLength);
 	
-			for (var i=xpResult.snapshotLength - 1; i>=0; i--) {
+			for (var i=xpResult.snapshotLength - 1; i > -1; i--) {
 				var img1 = xpResult.snapshotItem(i);
 
 				if (!img1.src.match(this.barImgRegexp)) {
@@ -136,18 +134,25 @@ var pm_ProgressBars = {
 	
 				var matchResult = img1.title.match(numRegExp);
 
-				if (matchResult && matchResult.length == 3) {
+				if (matchResult && matchResult.length == 3) 
+				{
 					if (addSoldTickets && addSoldTicketsPercent) {
 						span1.appendChild(aDocument.createTextNode(
 							matchResult[1] +'\u00a0('+ (matchResult[1]*100/matchResult[2]).toFixed(0) + '%)'));
-					} else if (addSoldTickets) {
+					} 
+					else if (addSoldTickets) 
+					{
 						span1.appendChild(aDocument.createTextNode(
 							matchResult[1]));
-					} else {
+					} 
+					else 
+					{
 						span1.appendChild(aDocument.createTextNode(
 							(matchResult[1]*100/matchResult[2]).toFixed(0) + '%'));
 					}
-				} else {
+				} 
+				else 
+				{
 					// Fallback to the image title, if match failed.
 					span1.appendChild(aDocument.createTextNode(img1.title));
 				}				
@@ -165,7 +170,16 @@ var pm_ProgressBars = {
 		}
 	},
 	
-	
+	/**
+	 * Create a text overlay.
+	 * 
+	 * @param {Document} aDocument
+	 * @param {HTMLImageElement} img1
+	 * @param {String} title
+	 * @param {Number} zIndex Layer index
+	 * @return text overlay
+	 * @type Node
+	 */
 	getTextOverlay: function getTextOverlay(aDocument, img1, title, zIndex) {
 		try {
 			//var leftPos = img1.x;
@@ -243,24 +257,27 @@ var pm_ProgressBars = {
 			img1.height = this.PROGRESSBAR_HEIGHT;
 			container.appendChild(img1);
 			
+			var img2 = null;
+			var text2 = '';
+			
 			if (value == 0) {
-				var img2 = aDocument.createElement('img');
+				img2 = aDocument.createElement('img');
 				img2.src = this.imagePaths['ljusbla'];
 				img2.width = this.PROGRESSBAR_WIDTH;
 				img2.height = this.PROGRESSBAR_HEIGHT;
 				
-				var text2 = this.getTextOverlay(aDocument, img2, '0%', 2);
+				text2 = this.getTextOverlay(aDocument, img2, '0%', 2);
 				text2.style.textAlign = 'left';
 				
 				container.appendChild(text2);
 				container.appendChild(img2);
 			}
 			else if (value == max) {
-				var img2 = aDocument.createElement('img');				img2.src = this.imagePaths['guld'];
+				img2 = aDocument.createElement('img');				img2.src = this.imagePaths['guld'];
 				img2.width = this.PROGRESSBAR_WIDTH;
 				img2.height = this.PROGRESSBAR_HEIGHT;
 				
-				var text2 = this.getTextOverlay(aDocument, img2, '100%', 2);
+				text2 = this.getTextOverlay(aDocument, img2, '100%', 2);
 				
 				container.appendChild(text2);
 				container.appendChild(img2);
@@ -281,7 +298,7 @@ var pm_ProgressBars = {
 					imgColor = 'gron';
 				}
 
-				var img2 = aDocument.createElement('img');
+				img2 = aDocument.createElement('img');
 				img2.src = this.imagePaths[imgColor];
 				img2.width = img2Width;
 				img2.height = this.PROGRESSBAR_HEIGHT;
@@ -291,7 +308,7 @@ var pm_ProgressBars = {
 				img3.width = img3Width;
 				img3.height = this.PROGRESSBAR_HEIGHT;
 
-				var text2 = this.getTextOverlay(aDocument, img2, ratio.toFixed(0) +'%', 2);
+				text2 = this.getTextOverlay(aDocument, img2, ratio.toFixed(0) +'%', 2);
 				
 				container.appendChild(text2);
 				container.appendChild(img2);

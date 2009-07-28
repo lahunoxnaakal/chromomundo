@@ -1,6 +1,6 @@
-/*
+/**
  * scoring.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -36,7 +36,7 @@ var pm_Scoring = {
 	_gDiff: undefined,
 	_bDiff: undefined,
 	
-	_maxScoreId: 26,
+	MAX_SCORED_ID: 26,
 	
 	_insertBefore: [" ", ".", ",", "!", "?", ":"],
 	
@@ -47,28 +47,70 @@ var pm_Scoring = {
 		"I": true
 	},
 	
-	// FIXME this won't work if the order of the parameters changes
-	scoreUrlRegExp: /\/Rules\.asp\?action\=Scoring\&Word=(.*)/i,
+	SCORE_ON_CITY_PAGE_XPATH: '/html/body/table[3]/tbody/tr/td[1]/table/tbody/tr/td/a[1]',
 	
+	SCORE_NUMBER_REGEXP: /\&word=(.*)/i,
 	
-	disableClickHandler: function disableClickHandler(evt) {
-		pm_Logger.debug("Link click is disabled");
-		evt.stopPropagation();
-		evt.preventDefault();
-		return false;
+	RULES_PAGE: 'rules.asp',
+	
+	SCORING_ACTION: 'action=scoring&',
+	
+	colorNumber: false,
+	scoreBase: 0,
+	disableLink: false,
+
+	
+	handleEvent: function handleEvent(e) {
+		try {
+			var target = e.target;
+			
+			if (!(target instanceof HTMLAnchorElement)) {
+				target = target.parentNode;
+				
+				if (!(target instanceof HTMLAnchorElement)) {
+					return true;
+				}
+			}
+			
+			switch (e.type) {
+			case "click":
+				var pathname = target.pathname.toLowerCase();
+
+				if (pathname.indexOf(this.RULES_PAGE) > -1) {
+					var search = target.search.toLowerCase();
+					
+					if (search.indexOf(this.SCORING_ACTION) > -1) {
+						pm_Logger.debug("Click event blocked");
+						e.stopPropagation();
+						e.preventDefault();
+						return false;
+					}
+				}
+				break;
+				
+			default:
+				pm_Logger.logError("Unexpected event: "+ e.type);
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+		
+		return true;
 	},
 
 
 	getScoreInsertionPosition: function getScoreInsertionPosition(nodeValue) {
+		var insertPos = -1;
+
 		try {
-			var insertPos;
 			var charPos; 
 			
-			for (var i = this._insertBefore.length - 1; i >= 0; i--) {
+			for (var i = this._insertBefore.length - 1; i > -1; i--) {
 				charPos = nodeValue.indexOf(this._insertBefore[i]);
 				
 				if (charPos >= 0) {
-					if (insertPos == undefined) {
+					if (insertPos == -1) {
 						insertPos = charPos;
 					} else {
 						insertPos = Math.min(insertPos, charPos);
@@ -76,25 +118,24 @@ var pm_Scoring = {
 				}
 			}
 
-			if (insertPos == undefined) {
+			if (insertPos == -1) {
 				insertPos = 0;
 			}
 		}
 		catch (err) {
 			pm_Logger.logError(err);
 		}
-		finally {
-			return insertPos;
-		}
+
+		return insertPos;
 	},
 	
 	
 	insertScoreNode: 
-	function insertScoreNode(scoreNode, parentNode, nextSibling) 
+	function insertScoreNode(aScoreNode, aParentNode, aNextSibling) 
 	{
 		/*
 		 * On character page (in Swedish):
-		 * Hank Hill  är en <b>flörtig</b> person med <b>\
+		 * Hank Hill  ?r en <b>fl?rtig</b> person med <b>\
 		 * <a href="Rules.asp?action=Scoring&Word=18" title="ypperlig 17/26">\
 		 * ypperlig</a> utstrålning</b> och <b>\
 		 * <a href="Rules.asp?action=Scoring&Word=20" title="himmelsk 19/26">\
@@ -122,10 +163,13 @@ var pm_Scoring = {
 		 * wundervoll</a></b>en tantrischen Nacht miteinander. </div>
 		 * 
 		 * A locale page (in German):
-		 * Qualität:  <b><a href="Rules.asp?action=Scoring&Word=20" \
+		 * Qualit?t:  <b><a href="Rules.asp?action=Scoring&Word=20" \
 		 * title="wundervoll 19/26">wundervoll</a></b><br />
 		 */
 		try {
+			var nextSibling = aNextSibling;
+			var parentNode = aParentNode;
+			
 			// Up one level (e.g. when parent node is "a")
 			while (nextSibling == null &&
 				this._selectUpperNodeFor[parentNode.tagName])
@@ -156,20 +200,75 @@ var pm_Scoring = {
 				parentNode.insertBefore(parentNode.ownerDocument.createTextNode(" "), nextSibling);
 			}
 
-			parentNode.insertBefore(scoreNode, nextSibling);
+			parentNode.insertBefore(aScoreNode, nextSibling);
 		}
 		catch (err) {
 			pm_Logger.logError(err);
 		}
 	},
 	
+	
+	_getPrefs: function _getPrefs() {
+		this.colorNumber = pm_Prefs.isEnabled(pm_PrefKeys.SCORING_COLOR_NUMBERS);
+		this.scoreBase = pm_Prefs.getPref(pm_PrefKeys.SCORING_BASE, 1);
+		this.disableLink = pm_Prefs.isEnabled(pm_PrefKeys.SCORING_DISABLE_LINK);
+		var colorType = pm_Prefs.getPref(pm_PrefKeys.SCORING_NUMBER_COLOR_TYPE, 0);
+		
+		if (colorType == pm_Scoring.RAINBOW_COLOR) {
+			this.getScoreColor = this.getRainbowColor;
+		}
+		else if (colorType == pm_Scoring.GRADIENT_COLOR) {
+			this.setGradientColors();
+			this.getScoreColor = this.getGradientColor;
+		}
+		else {
+			pm_Logger.logError('Unsupported color type: '+ colorType);
+			this.getScoreColor = this.getRainbowColor;
+		}
+	},
+	
 		
 	addNumericScores: function addNumericScores(aDocument) {
 		try {
-			if (!pm_Prefs.isEnabled(pm_PrefKeys.SCORING_FEATURES_ENABLED)) {
-				return;
+			var addNumber = pm_Prefs.isEnabled(pm_PrefKeys.SCORING_ADD_NUMBERS);
+			// Continue if at least one of the features is enabled.
+			if (!addNumber) {
+				return;	
 			}
 			
+			// Loop through all anchor nodes.
+			var nodes = aDocument.getElementsByTagName('a');
+
+			this._addNumericScoresOnLinkNodes(aDocument, nodes);
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+	},
+
+	
+	addNumericScoresOnCityPage: function addNumericScoresOnCityPage(aDocument) {
+		try {
+			var addNumber = pm_Prefs.isEnabled(pm_PrefKeys.SCORING_ADD_NUMBERS);
+			
+			// Continue if at least one of the features is enabled.
+			if (!addNumber) {
+				return;	
+			}
+
+			var node = pm_XPathFirstNode(this.SCORE_ON_CITY_PAGE_XPATH, aDocument);
+			var nodes = [node];
+
+			this._addNumericScoresOnLinkNodes(aDocument, nodes);
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+	},
+
+	
+	_addNumericScoresOnLinkNodes: function _addNumericScoresOnLinkNodes(aDocument, aNodes) {
+		try {
 			var addNumber = pm_Prefs.isEnabled(pm_PrefKeys.SCORING_ADD_NUMBERS);
 	
 			// Continue if at least one of the features is enabled.
@@ -178,110 +277,112 @@ var pm_Scoring = {
 			}
 			
 			// Initialize rest of the variables.
-			var colorNumber = pm_Prefs.isEnabled(pm_PrefKeys.SCORING_COLOR_NUMBERS);
-			var scoreBase = pm_Prefs.getSetting(pm_PrefKeys.SCORING_BASE, 1);
-			var colorType = pm_Prefs.getSetting(pm_PrefKeys.SCORING_NUMBER_COLOR_TYPE, 0);
-			var disableLink = pm_Prefs.isEnabled(pm_PrefKeys.SCORING_DISABLE_LINK);
+			this._getPrefs();
 			
-			if (colorType == pm_Scoring.RAINBOW_COLOR) {
-				this.getScoreColor = this.getRainbowColor;
+			// Disable link.
+			if (this.disableLink) {
+				pm_Logger.debug("install click event handler");
+				aDocument.body.addEventListener('click', this, true);
 			}
-			else if (colorType == pm_Scoring.GRADIENT_COLOR) {
-				this.setGradientColors();
-				this.getScoreColor = this.getGradientColor;
-			}
-			else {
-				pm_Logger.logError('Unsupported color type: '+ colorType);
-				this.getScoreColor = this.getRainbowColor;
-			}
-					
-			// Loop through all anchor nodes.
-			var nodes = aDocument.getElementsByTagName('a');
-			pm_Logger.debug('nodes='+ nodes.length);
 
-			var ignoredLinks = 0;
+			var processedLinks = 0;
 		
-			for (var i=nodes.length - 1; i>=0; i--) {
-				var node = nodes.item(i);
-				var href1 = node.href;
-			
-				// Match to score link pattern.
-				var matchList = href1.match(this.scoreUrlRegExp);
-		
-				// Is a match?
-				if (matchList && matchList.length >= 2) {
-					var scoreId = parseInt(matchList[1]) - 1;
-					pm_Logger.debug("scoreId="+ scoreId);
-					
-					// Map the id to numeric score.
-					var score = scoreId + parseInt(scoreBase);
-					pm_Logger.debug('var score = '+ scoreId + " + " + scoreBase + " = " + score);
-                    
-					var scoreNode = aDocument.createElement('span');
-					scoreNode.className = 'popomungo_score';
-					
-					// In color?
-					if (colorNumber) {
-						var colorObj = this.getScoreColor(scoreId);
-						var bgColor = colorObj.bgColor;
-						var textColor = colorObj.textColor;
-						
-						// Create colored, numeric score element.
-						scoreNode.setAttribute('style', 'background: '+ bgColor +'; color: '+ textColor +';');
-						scoreNode.appendChild(aDocument.createTextNode('\u00a0'+ score + '\u00a0'));
-					} else {
-						scoreNode.appendChild(aDocument.createTextNode('('+ score +')'));
-					}
+			pm_Logger.debug('nodes='+ aNodes.length);
 
-					// Insert element.
-					this.insertScoreNode(scoreNode, node.parentNode, node.nextSibling);
-					
-					if (disableLink) {
-						pm_Logger.debug("Disabling click");
-						node.addEventListener('click', pm_Scoring.disableClickHandler, true);
-						node.className = 'popomungo_disabled';
-					}
-				}
-				else {
-					ignoredLinks++;
-				}
+			for (var i = aNodes.length - 1; i > -1; i--) {
+				var node = aNodes[i];
+				if (this._addScoreNumberOnLink(aDocument, node))
+					++processedLinks;
 			}
 
-			if (ignoredLinks) {
-				pm_Logger.debug('ignored='+ ignoredLinks);
-			}
+			pm_Logger.debug('processed='+ processedLinks);
 		}
 		catch (err) {
 			pm_Logger.logError(err);
 		}
 	},
 	
+
+	_addScoreNumberOnLink: function _addScoreNumberOnLink(aDocument, aNode) {
+		try {
+			var pathname = aNode.pathname.toLowerCase();
+
+			if (pathname.indexOf(this.RULES_PAGE) > -1) {
+				var search = aNode.search.toLowerCase();
+
+				if (search.indexOf(this.SCORING_ACTION) > -1) {
+					// Match to score link pattern.
+					var matchList = search.match(this.SCORE_NUMBER_REGEXP);
+			
+					// Is a match?
+					if (matchList) {
+						var scoreId = parseInt(matchList[1]) - 1;
+						//pm_Logger.debug("scoreId="+ scoreId);
+						
+						// Map the id to numeric score.
+						var score = scoreId + parseInt(this.scoreBase);
+						
+						var scoreNode = aDocument.createElement('span');
+						scoreNode.className = 'popomungo_score';
+						
+						// In color?
+						if (this.colorNumber) {
+							var colorObj = this.getScoreColor(scoreId);
+							var bgColor = colorObj.bgColor;
+							var textColor = colorObj.textColor;
+							
+							// Create colored, numeric score element.
+							scoreNode.setAttribute('style', 'background: '+ bgColor +'; color: '+ textColor +';');
+							scoreNode.appendChild(aDocument.createTextNode('\u00a0'+ score + '\u00a0'));
+						} else {
+							scoreNode.appendChild(aDocument.createTextNode('('+ score +')'));
+						}
+		
+						// Insert element.
+						this.insertScoreNode(scoreNode, aNode.parentNode, aNode.nextSibling);
+						
+						return true;
+					}
+				}
+			}
+		}
+		catch (err) {
+			pm_Logger.logError(err);
+		}
+		
+		return false;
+	},
 	
-	/*
+	
+	/**
 	 * This is just a pointer that is assigned by addNumericScores function.
 	 */
 	getScoreColor: function getScoreColor(scoreId) {
+		// no code here
 	},
 	
 
 	getRainbowColor: function getRainbowColor(scoreId)  {
 		try {
+			var bgColor;
+			var textColor;
+			
 			// Return previously calculated color.
 			if (this._rainbowBgColors[scoreId]) {
-				var bgColor = this._rainbowBgColors[scoreId];
-				var textColor = this._textColors[bgColor];
+				bgColor = this._rainbowBgColors[scoreId];
+				textColor = this._textColors[bgColor];
 	
 				return new pm_TextColor(textColor, bgColor);
 			} 
 	
 			// Calculate background color.
-			var hue = 360 - 330 * (scoreId / this._maxScoreId);
+			var hue = 360 - 330 * (scoreId / this.MAX_SCORED_ID);
 	
 			var rgbObj = pm_Color.convertHsvToRgb(hue, 1, 1);
-			var bgColor = rgbObj.toHex();
+			bgColor = rgbObj.toHex();
 			
 			// Calculate foreground color.
-			var textColor = pm_Color.idealTextColor(
+			textColor = pm_Color.idealTextColor(
 				rgbObj.R, rgbObj.G, rgbObj.B);
 			
 			// Store colors.
@@ -304,16 +405,19 @@ var pm_Scoring = {
  	
 	getGradientColor: function getGradientColor(scoreId)  {
 		try {
+			var bgColor;
+			var textColor;
+			
 			// Return previously calculated color.
 			if (this._gradientBgColors[scoreId]) {
-				var bgColor = this._gradientBgColors[scoreId];
-				var textColor = this._textColors[bgColor];
+				bgColor = this._gradientBgColors[scoreId];
+				textColor = this._textColors[bgColor];
 	
 				return new pm_TextColor(textColor, bgColor);
 			}
 			
 			// Calculate background color.
-			var ratio = scoreId / this._maxScoreId;
+			var ratio = scoreId / this.MAX_SCORED_ID;
 			var c = ratio; // alternative value: this.transform(ratio);
 			
 			pm_Logger.debug(
@@ -327,10 +431,10 @@ var pm_Scoring = {
 			var b = this._rgbBgColorFrom.B + this._bDiff * c;
 	
 			var rgbObj = new pm_RGB(r.toFixed(0), g.toFixed(0), b.toFixed(0));
-			var bgColor = rgbObj.toHex();
+			bgColor = rgbObj.toHex();
 			
 			// Calculate foreground color.
-			var textColor = pm_Color.idealTextColor(
+			textColor = pm_Color.idealTextColor(
 				rgbObj.R, rgbObj.G, rgbObj.B);
 			
 			// Store colors.
@@ -368,7 +472,7 @@ var pm_Scoring = {
 		}
 	},
 	
-	/*
+	/**
 	 * S curve function for reducing the mid-colors.
 	 * 
 	 * x = [0,1]
