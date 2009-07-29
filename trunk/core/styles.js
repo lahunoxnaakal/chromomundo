@@ -1,6 +1,6 @@
-/*
+/**
  * styles.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -22,7 +22,7 @@ var pm_Styles = {
 	THEME_REGEXP: /css\/themes\/(.*?)\/.*?\.css$/i,
 
 
-	/*
+	/**
 	 * Append CSS to the document head.
 	 * 
 	 * @param aDocument
@@ -32,11 +32,10 @@ var pm_Styles = {
 			var link = aDocument.createElement('link');
 			link.rel = "stylesheet";
 			link.type = "text/css";
-            // chrome has a different way
-			// link.href = "chrome://popomungo/content/popomungo.css";
+            // chrome has a different way			
             link.href = chrome.extension.getURL("popomungo.css");
 
-			var head = aDocument.getElementsByTagName('head')[0]
+			var head = aDocument.getElementsByTagName('head')[0];
 			head.appendChild(link);
 
 		}
@@ -46,7 +45,7 @@ var pm_Styles = {
 	},
 
 	
-	/*
+	/**
 	 * Get the current theme.
 	 * 
 	 * Known themes: 
@@ -62,7 +61,7 @@ var pm_Styles = {
 		try {
 			var links = aDocument.getElementsByTagName('link');
 			
-			for (var i = links.length - 1; i >= 0; i--) {
+			for (var i = links.length - 1; i > -1; i--) {
 				if (links[i].rel == 'stylesheet') {
 					var result = links[i].href.match(this.THEME_REGEXP);
 					

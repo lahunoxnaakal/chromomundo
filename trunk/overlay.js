@@ -1,6 +1,6 @@
-/*
+/**
  * overlay.js
- * Copyright (c) 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -24,14 +24,19 @@
 *   ported from Popomungo, the Firefox's original Extension.
 */
 
-function PopomungoOverlay() {
-	this.localeStrings = undefined;
+function pm_OverlayClass() {
+	// void
+}
+
+pm_OverlayClass.prototype = {
+		
+	requestCount: 0,
 	
-	this.requestCount = 0;
+	listenerEnabled: false,
 	
-	this.listenerEnabled = false;
+	contextMenuListenerEnabled: false,
 	
-	this.ignoredPages = {
+	ignoredPages: {
 		'cheater': true,
 		'cn': true,
 		'defaultconf': true,
@@ -42,7 +47,7 @@ function PopomungoOverlay() {
 		'pageexpired': true,
 		'performancelive': true,
 		'wallpaper': true
-	}
+	},
 	
 
 	/**
@@ -50,11 +55,11 @@ function PopomungoOverlay() {
 	 *  
 	 * @param {Document} aDocument
 	 */
-	this.handleContent = function handleContent(aDocument) {
+	handleContent: function handleContent(aDocument) {
 		try {
 			this.requestCount++;
 			
-			var date1 = new Date();
+			var timer1 = new pm_TimerClass("Request #"+ this.requestCount);
 			var path1 = aDocument.location.pathname;
 			var query1 = aDocument.location.search;
 
@@ -80,8 +85,9 @@ function PopomungoOverlay() {
 				return;
 			}
 
-			var page, action, action2, result;
+			pm_ElementCache.clear();
 
+			var page, action, action2;
 			var result = path1.match(/\/([a-z0-9]+)\.asp/i);
 			if (result) {
 				page = result[1].toLowerCase();
@@ -97,12 +103,10 @@ function PopomungoOverlay() {
 				action2 = result[1].toLowerCase();
 			}
 
-            /*
 			pm_Logger.debug("Request #"+ this.requestCount +
 				"\npage="+ page +
 				"\naction="+ action +
 				"\naction2="+ action2);
-			*/
 
 			var processScoreNumbersEnabled = true;
 			var processLinksEnabled = true;
@@ -153,10 +157,14 @@ function PopomungoOverlay() {
 				
 				pm_Strings.InitStringBundle(langId);
 				
+				pm_Logger.debug(timer1.elapsedTimeStr());
+
 				pm_Logger.debug("Pre-tasks");
 
 				pm_Styles.appendCSS(aDocument);
 		
+				pm_Logger.debug(timer1.elapsedTimeStr());
+
 				pm_Logger.debug("Main-tasks");
 
 				if (page == 'city') {
@@ -164,6 +172,7 @@ function PopomungoOverlay() {
 						action == undefined) 
 					{
 						pm_Locales.addLocaleIcons(aDocument);
+						pm_Logger.debug(timer1.elapsedTimeStr());
 
 						//pm_UserSettings.updateSettingsFromCityPage(aDocument);
 						//pm_Traveling.addRouteInfoOnCityPage(aDocument);						
@@ -171,6 +180,7 @@ function PopomungoOverlay() {
 						// Too many links here, we will need to use another methods.
 						processScoreNumbersEnabled = false;
 						pm_Scoring.addNumericScoresOnCityPage(aDocument);
+						pm_Logger.debug(timer1.elapsedTimeStr());
 
 						processLinksEnabled = false;
 						pm_Links.addEventHandlerOnCityPage(aDocument);
@@ -296,7 +306,7 @@ function PopomungoOverlay() {
 				}
 				else if (page == 'relationshipdetails') {
 					pm_ProgressBars.addTextOverStats(aDocument);
-				}                
+				}
 				else if (page == 'artist') {
 					/*if (action == undefined ||
 						action == 'view')
@@ -396,60 +406,107 @@ function PopomungoOverlay() {
 				// CharacterDiary/view
 				// CharacterBlog/ReadBlog CreateBlogEntry
 
+				pm_Logger.debug(timer1.elapsedTimeStr());
+
 				pm_Logger.debug("Post-tasks");
 
+				pm_Bookmarks.showBookmarks(aDocument);
+				pm_Logger.debug(timer1.elapsedTimeStr());
+
 				if (processScoreNumbersEnabled) {
-					pm_Scoring.addNumericScores(aDocument);					
+					pm_Scoring.addNumericScores(aDocument);
+					pm_Logger.debug(timer1.elapsedTimeStr());
 				}
-				
+			
 				if (processLinksEnabled) {
 					pm_Links.processLinks(aDocument);
+					pm_Logger.debug(timer1.elapsedTimeStr());
 				}
 			}
 			else {
 				pm_Logger.debug("Character ID is not available.");
 			}
-
-			var date2 = new Date();
-			var ms = date2.getTime() - date1.getTime();
-			pm_Logger.debug('Request #'+ this.requestCount +
-				' rendering took '+ ms +' milliseconds');
+			
+			pm_Logger.debug(timer1.elapsedTimeStr());
+			pm_Logger.debug('Request #'+ this.requestCount + ' completed.');
 		}
 		catch (err)
 		{
 			pm_Logger.logError(err);
 		}
-	};
+	},
 	
 
-	this.isPopmundoDomain = function isPopmundoDomain(aDocument) {
+	isPopmundoDomain: function isPopmundoDomain(aDocument)
+    {
 		if (aDocument.location ) {
 			return (null != aDocument.location.href.match(/^.*\.(popmundo|popomundo)\.com/i));
 		}
 		
 		return false;
-	};
+	},
 	
 
-	this.isPageLoadError = function (aDocument) {
+	isPageLoadError: function (aDocument) {
 		return (aDocument.documentURI.substr(0,14) == "about:neterror"); 		
 	},
 
 
-	this.onPageLoad = function onPageLoad(event) {
-		if (event.originalTarget.nodeName == '#document') {
-			var vDocument = event.originalTarget;
+	onPageLoad: function onPageLoad(event) {
+		var vDocument = event.originalTarget;
+
+ 		pm_Logger.debug("Target="+ vDocument);
+ 		
+		if (vDocument instanceof HTMLDocument) {
+			pm_Logger.debug("URL="+ vDocument.URL);		
+
 			
-			if (this.isPopmundoDomain(vDocument) &&
-				!this.isPageLoadError(vDocument))
-			{
-				this.handleContent(vDocument);
+			if (this.isPopmundoDomain(vDocument)) {
+				if(!this.isPageLoadError(vDocument)) {
+					this.handleContent(vDocument);
+				}
+				else {
+		      		pm_Logger.debug("Page load error. Content ignored.");
+				}
 	      	}
-	    }	    
-	};
+	      	else {
+	      		pm_Logger.debug("Domain ignored.");
+	      	}
+		}
+		else {
+			pm_Logger.debug("Target ignored.");
+		}
+	},
+    
+    checkDomain: function checkDomain(vDocument)
+    {
+        pm_Logger.debug("Target="+ vDocument);
+		if (vDocument instanceof HTMLDocument) {
+			pm_Logger.debug("URL="+ vDocument.URL);		
+
+			
+			if (this.isPopmundoDomain(vDocument)) {
+				if(!this.isPageLoadError(vDocument)) {
+					this.handleContent(vDocument);
+				}
+				else {
+		      		pm_Logger.debug("Page load error. Content ignored.");
+				}
+	      	}
+	      	else {
+	      		pm_Logger.debug("Domain ignored.");
+	      	}
+		}
+		else {
+			pm_Logger.debug("Target ignored.");
+		}        
+    },
 
 	
-	this.handleEvent = function handleEvent(event) {
+	handleEvent: function handleEvent(event) {
+		pm_Logger.setTraceLevelFromPref();
+		pm_Logger.debug("Event="+ event.type);
+		
 		switch (event.type) {
 			case "DOMContentLoaded": 
 				this.onPageLoad(event);
@@ -462,40 +519,43 @@ function PopomungoOverlay() {
 				break;
 			default: 
 				pm_Logger.logError("Unexpected event: "+ event.type);
-		}		
-	};
+		}
+	},
 
 
-	this.init = function init() {
-		this.logExtensionInfo();
-		
+	init: function init() {
+		this.logExtensionInfo();		
 		this.refreshUI();
-	};
+	},
 	
 	
-	this.deinit = function deinit() {
+	deinit: function deinit() {
+		pm_Logger.debug("Unload extension.");
 
-	};
+	},
 	
 	
-	this.dateFormatSettingIsOutOfDate = function dateFormatSettingIsOutOfDate(dateFormatTypeId) {
+	dateFormatSettingIsOutOfDate: function dateFormatSettingIsOutOfDate(dateFormatTypeId) {
 		if (dateFormatTypeId) {
 			pm_Prefs.setPref(pm_PrefKeys.DATE_FORMAT_TYPE_ID, dateFormatTypeId);
 		}
-	};
+	},
 	
-	this.logExtensionInfo = function logExtensionInfo() {
-	}
+	logExtensionInfo: function logExtensionInfo() {
+	},
 	
-	this.refreshUI = function refreshUI() {
+	
+	refreshUI: function refreshUI() {
 		pm_Logger.setTraceLevelFromPref();
-		var enabled = pm_Prefs.getPref(pm_PrefKeys.ENABLED, true);
+		var enabled = pm_Prefs.isEnabled(pm_PrefKeys.ENABLED);
+		//this.setListener(enabled);
+		//pm_MenuHandler.setContextMenuListener(enabled);
 
 		return enabled;		
-	};
+	},
 
 	
-	this.toggleEnabled = function toggleEnabled() {
+	toggleEnabled: function toggleEnabled() {
 		// Toggle state.
 		var enabled = !pm_Prefs.getPref(pm_PrefKeys.ENABLED, true);
 		
@@ -503,10 +563,10 @@ function PopomungoOverlay() {
 		pm_Prefs.setPref(pm_PrefKeys.ENABLED, enabled);
 		
 		return enabled;
-	};
+	},
 	
 
-	this.setListener = function setListener(aEnabled) {
+	setListener: function setListener(aEnabled) {
 		var appcontent = document.getElementById("appcontent");
 		
 		if (appcontent) {
@@ -524,24 +584,20 @@ function PopomungoOverlay() {
 				pm_Logger.debug('DOMContentLoaded listener enabled='+ this.listenerEnabled);
 			}			
 		}
-	};
+	},
 
-	/**
-	 * Observe preferences.
-	 */
-	this.observe = function observe(aSubject, aTopic, aData)
-	{
-		pm_Logger.debug('topic='+ aTopic +', data='+ aData);
-		
-		if (aTopic == 'nsPref:changed') {
-			this.refreshUI();
-		}
-	};
+	broadcastState: function broadcastState(aEnabled) {
 
-	this.toString = function toString() {
-		return "[object ChromomungoOverlay]";
-	};
+	},
+	
+
+	toString: function toString() {
+		return "[object pm_OverlayClass]";
+	}
+	
 };
+
+var pm_Overlay = new pm_OverlayClass();
 
 function onMessageReceived(data)
 {
@@ -550,30 +606,26 @@ function onMessageReceived(data)
     if ( data.message == "Hello!" )
     {        
         pm_Prefs.dict = data.values; 
-        /* 
-        for ( var i = 0; i < pm_Prefs.dict.length; i++ )
-        {
-            console.log(pm_Prefs.dict[i]);
-        }*/
-                
-        if ( pm_Prefs.isEnabled(pm_PrefKeys.ENABLED) )
+         
+        if ( pm_Overlay.refreshUI() )
         {
             console.log("Chromomungo is ENABLED");
-            pm_Overlay.handleContent(document);
+            pm_Overlay.checkDomain(document);
+            port.disconnect();
         }
         else
         {
             console.log("Chromomungo is DISABLED");
         }               
     }
-}
+};
 
 console.log("Chromomungo: page loaded!");
 var port = chrome.extension.connect();
 port.onMessage.addListener(onMessageReceived); 
 port.postMessage({message: "Hello!", values: [1,2,3]});
-var pm_Overlay = new PopomungoOverlay();
-//pm_Overlay.handleContent(document);
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // EOF

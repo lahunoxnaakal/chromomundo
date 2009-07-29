@@ -1,6 +1,6 @@
-/*
+/**
  * userSettings.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -26,11 +26,11 @@ var pm_UserSettings = {
 	
 	locationUrlRegExp: /\/Locale\.asp/i,
 	
-	charId: undefined,	
-	langId: undefined,	
-	companyId: undefined,	
-	dateFormatTypeId: undefined,
-	timeFormatTypeId: undefined,
+	charId: 0,	
+	langId: 0,	
+	companyId: 0,	
+	dateFormatTypeId: 0,
+	timeFormatTypeId: 0,
 	
 	CHARACTER_ID_XPATH: "//tr[@class='MainMenu']/td[1]/a[2]",
 
@@ -316,17 +316,17 @@ var pm_UserSettings = {
 	
 	LoggedOut:
 	function LoggedOut(doc) {
-		this.charId = undefined;
-		this.langId = undefined;
-		this.companyId = undefined;
-		this.dateFormatTypeId = undefined;
-		this.timeFormatTypeId = undefined;
+		this.charId = 0;
+		this.langId = 0;
+		this.companyId = 0;
+		this.dateFormatTypeId = 0;
+		this.timeFormatTypeId = 0;
 	},
 	
 	
 	IsOnline:
 	function IsOnline() {
-		return (this.charId != undefined);
+		return (this.charId != 0);
 	},
 	
 	
@@ -341,7 +341,7 @@ var pm_UserSettings = {
 			var tmp = {};
 			
 			// Gather unique values.
-			for (var i = 0; i < children.length; i++) {
+			for (var i = children.length - 1; i > -1 ; i--) {
 				var id = children[i].split(".")[0];
 				
 				tmp[id] = true;
@@ -386,18 +386,18 @@ var pm_UserSettings = {
 			}
 			else if (aData == pm_PrefKeys.LANGUAGE_ID.replace("<n>", charId)) {
 				pm_Logger.debug("Language ID reset");
-				pm_UserSettings.langId = pm_Prefs.getPref(aData, pm_DefaultPrefs.LANGUAGE_ID);
+				pm_UserSettings.langId = 0;
 			}
 			else if (aData == pm_PrefKeys.CHARACTER_NAME.replace("<n>", charId)) {
 				pm_Logger.debug("Character name updated");
 			}
 			else if (aData == pm_PrefKeys.DATE_FORMAT_TYPE_ID.replace("<n>", charId)) {
 				pm_Logger.debug("Date format type ID reset");
-				pm_UserSettings.dateFormatTypeId = pm_Prefs.getPref(aData, pm_DefaultPrefs.DATE_FORMAT_TYPE_ID);
+				pm_UserSettings.dateFormatTypeId = 0;
 			}
 			else if (aData == pm_PrefKeys.TIME_FORMAT_TYPE_ID.replace("<n>", charId)) {
 				pm_Logger.debug("Time format type ID reset");
-				pm_UserSettings.timeFormatTypeId = pm_Prefs.getPref(aData, pm_DefaultPrefs.TIME_FORMAT_TYPE_ID);
+				pm_UserSettings.timeFormatTypeId = 0;
 			}
 			else {
 				pm_Logger.debug("No match found: "+ aData);

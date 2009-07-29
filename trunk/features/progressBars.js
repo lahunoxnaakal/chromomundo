@@ -18,7 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var pm_ProgressBars = {
+/** 
+ * @constructor 
+ */
+function pm_ProgressBarsClass() {
+	// void
+}
+
+pm_ProgressBarsClass.prototype = {
 	
 	barImagesXpath: '//img',
 	
@@ -84,13 +91,15 @@ var pm_ProgressBars = {
 				
 				if (aTitleRegexp) {
 					matchResult = img1.title.match(aTitleRegexp);
-				} else {
+				}
+				else {
 					matchResult = img1.title.match(this.DEFAULT_REGEXP);
 				}					
 					
 				if (matchResult && matchResult.length > 1) {
 					title = matchResult[1];
-				} else {
+				}
+				else {
 					title = img1.title;
 				}
 
@@ -134,25 +143,22 @@ var pm_ProgressBars = {
 	
 				var matchResult = img1.title.match(numRegExp);
 
-				if (matchResult && matchResult.length == 3) 
-				{
+				if (matchResult && matchResult.length == 3) {
+					
 					if (addSoldTickets && addSoldTicketsPercent) {
 						span1.appendChild(aDocument.createTextNode(
 							matchResult[1] +'\u00a0('+ (matchResult[1]*100/matchResult[2]).toFixed(0) + '%)'));
-					} 
-					else if (addSoldTickets) 
-					{
+					}
+					else if (addSoldTickets) {
 						span1.appendChild(aDocument.createTextNode(
 							matchResult[1]));
-					} 
-					else 
-					{
+					}
+					else {
 						span1.appendChild(aDocument.createTextNode(
 							(matchResult[1]*100/matchResult[2]).toFixed(0) + '%'));
 					}
-				} 
-				else 
-				{
+				}
+				else {
 					// Fallback to the image title, if match failed.
 					span1.appendChild(aDocument.createTextNode(img1.title));
 				}				
@@ -365,3 +371,7 @@ var pm_ProgressBars = {
 		return undefined;
 	}
 };
+
+var pm_ProgressBars = new pm_ProgressBarsClass();
+
+// EOF
