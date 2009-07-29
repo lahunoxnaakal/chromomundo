@@ -1,6 +1,6 @@
-/*
+/**
  * color.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -20,7 +20,7 @@
 
 var pm_Color = {
 	
-	/*
+	/**
 	 * Source of the algorithm:
 	 * "HSV color space"
 	 * http://en.wikipedia.org/wiki/HSV_color_space
@@ -59,7 +59,7 @@ var pm_Color = {
 	},
 	
 	
-	/*
+	/**
 	 * @param RGB	A hex color string, for example "#abcdef".
 	 *  
 	 * Source of the algorithm: 
@@ -116,14 +116,14 @@ var pm_Color = {
 	},
 	
 	
-	/*
+	/**
 	 * Source of the algorithm / code snippet: 
 	 * "Determining Ideal Text Color Based on Specified Background Color"
 	 * by John Simmons
 	 * http://www.codeproject.com/cs/media/IdealTextColor.asp
 	 */
 	idealTextColor: function idealTextColor(r, g, b) {
-    	var nThreshold = 150
+    	var nThreshold = 150;
     	var bgDelta = ((r * 0.299) + (g * 0.587) + (b * 0.114)).toFixed(0);
 
     	if (bgDelta > nThreshold) {
@@ -174,7 +174,7 @@ pm_RGB.prototype.toHex = function toHex() {
 };
 
 
-/*
+/**
  * parseHex (a static class function)
  */ 
 pm_RGB.parseHex = function parseHex(rgb) {
@@ -183,7 +183,7 @@ pm_RGB.parseHex = function parseHex(rgb) {
 	var b = parseInt('0x'+ rgb.substr(5, 2));
 	
 	return new pm_RGB(r, g, b);
-}
+};
 
 
 function pm_TextColor(text, bg) {

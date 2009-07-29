@@ -1,6 +1,6 @@
-/*
+/**
  * popoDate.js
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -28,25 +28,26 @@ var pm_PopoDate = {
 	function convertToDateObject(dateString, splitRegExp, 
 		yearIndex, monthIndex, dayIndex) 
 	{
-		var date1 = null;
-		
 		try {
+			var date1 = null;
 			var dateArr = dateString.split(splitRegExp);
 		
 			if (dateArr && dateArr.length == 3) {
 				date1 = new Date(dateArr[yearIndex], dateArr[monthIndex]-1, dateArr[dayIndex], 12);
 				date1.setUTCHours(12,0,0,0);
 			}
+			
+			return date1;
 		}
 		catch (err) {
 			pm_Logger.logError(err);
 		}
 		
-		return date1;
+		return null;
 	},
 	
 	
-	/*
+	/**
 	 * 1: YYYY-MM-DD
 	 * 2: DD/MM/YYYY
 	 * 3: DD.MM.YYYY
@@ -56,9 +57,9 @@ var pm_PopoDate = {
 	 */
 	doConversionByFormat: 
 	function doConversionByFormat(dateString, dateFormatTypeId) {
-		var dateObj = null;
-		
 		try {
+			var dateObj = null;
+			
 			switch (dateFormatTypeId) {
 				case 1: dateObj = this.convertToDateObject(dateString, /\-/, 0, 1, 2); break;
 				case 2: dateObj = this.convertToDateObject(dateString, /\//, 2, 1, 0); break;
@@ -71,12 +72,14 @@ var pm_PopoDate = {
 						pm_StringKeys.MESSAGE_UNSUPPORTED_DATE_FORMAT, [pm_UserSettings.getDateFormatTypeId()]);
 					pm_Logger.logError(error_msg);
 			}
+			
+			return dateObj;
 		}
 		catch (err) {
 			pm_Logger.logError(err);
 		}
 		
-		return dateObj;
+		return null;
 	},
 	
 	
@@ -111,7 +114,7 @@ var pm_PopoDate = {
 	},	
 	
 	
-	/*
+	/**
 	 * 1: YYYY-MM-DD
 	 * 2: DD/MM/YYYY
 	 * 3: DD.MM.YYYY

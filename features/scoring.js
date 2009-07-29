@@ -132,32 +132,32 @@ var pm_Scoring = {
 	
 	insertScoreNode: 
 	function insertScoreNode(aScoreNode, aParentNode, aNextSibling) 
-	{
+	{		
 		/*
 		 * On character page (in Swedish):
 		 * Hank Hill  ?r en <b>fl?rtig</b> person med <b>\
 		 * <a href="Rules.asp?action=Scoring&Word=18" title="ypperlig 17/26">\
-		 * ypperlig</a> utstrålning</b> och <b>\
+		 * ypperlig</a> utstr?lning</b> och <b>\
 		 * <a href="Rules.asp?action=Scoring&Word=20" title="himmelsk 19/26">\
 		 * himmelsk</a>t utseende</b>. Den totala kapaciteten av Hanks \
-		 * hjärnceller ger en <b><a href="Rules.asp?action=Scoring&Word=22" \
-		 * title="makalös 21/26">makalös</a> IQ</b>. Hank har en <b>\
+		 * hj?rnceller ger en <b><a href="Rules.asp?action=Scoring&Word=22" \
+		 * title="makal?s 21/26">makal?s</a> IQ</b>. Hank har en <b>\
 		 * <a href="Rules.asp?action=Scoring&Word=17" title="underbar 16/26">\
-		 * underbar</a> sångröst</b> och uppvisar <b>\
-		 * <a href="Rules.asp?action=Scoring&Word=22" title="makalös 21/26">\
-		 * makalös</a> musikalisk talang</b>.
+		 * underbar</a> s?ngr?st</b> och uppvisar <b>\
+		 * <a href="Rules.asp?action=Scoring&Word=22" title="makal?s 21/26">\
+		 * makal?s</a> musikalisk talang</b>.
 		 * 
 		 * A diary entry (in Swedish):
 		 * <a href="CharacterDetails.asp?action=view&CharacterID=123">\
-		 * <b>Hank Hill </b></a> ringde mig för att ha ett <b>\
-		 * <a href="Rules.asp?action=Scoring&Word=22" title="makalös 21/26">\
-		 * makalös</a></b>t "privat" samtal.
+		 * <b>Hank Hill </b></a> ringde mig f?r att ha ett <b>\
+		 * <a href="Rules.asp?action=Scoring&Word=22" title="makal?s 21/26">\
+		 * makal?s</a></b>t "privat" samtal.
 		 * 
 		 * A diary entry (in German):
 		 * <div style="Padding-bottom:5px;">\
-		 * Erschöpft, aber voller Glück erreichten \
+		 * Ersch?pft, aber voller Gl?ck erreichten \
 		 * <a href="CharacterDetails.asp?action=view&CharacterID=98578">\
-		 * <b>Mikhailov Jerayesh</b></a> und ich endlich den Höhepunkt, \
+		 * <b>Mikhailov Jerayesh</b></a> und ich endlich den H?hepunkt, \
 		 * zufrieden nach unserer <b>\
 		 * <a href="Rules.asp?action=Scoring&Word=20" title="wundervoll 19/26">\
 		 * wundervoll</a></b>en tantrischen Nacht miteinander. </div>

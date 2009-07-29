@@ -1,6 +1,6 @@
-/*
+/**
  * popoLang.js
- * Copyright © 2007-2009 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -19,7 +19,7 @@
 */
 
 /** 
- * @see http://wiki.mozilla.org/L10n:Simple_locale_names
+ * See also: http://wiki.mozilla.org/L10n:Simple_locale_names
  */
 var pm_LanguageIdMap = {
 	0: 'en', // default language
@@ -117,7 +117,7 @@ var pm_LanguageIdMap = {
 
 //////////////////////////////////////////////////////////////////////
 var pm_PopoLang = {
-	detectedLangId: undefined,
+	detectedLangId: 0,
 	
 	CITY_INFO_XPATH: "//tr[@class='MainMenu']/td[1]/a[1]",
 
@@ -146,7 +146,6 @@ var pm_PopoLang = {
  *  58: Grad       Lična Karta       Bend       Kompanija                     Lokacija         Zajednica     VIP   	[Telefonski imenik]  [Traži]    [Forum]   [Pomoć]                  [Odlogiraj se]
  *  33: Város      Karakter          Karrier    Cég                           Hol vagy most?   Közösség      VIP   	[Telefonkönyv]       [Keresés]  [Fórum]   [Súgó]                   [Kijelentkezés]
  *  36: Linn       Tegelane          Karjäär    Firma         Tegevdirektor   Asukoht          Kogukond      VIP   	[Telefoni raamat]    [Otsing]   [Foorum]  [Abi]                    [Logi Välja] 
- *  43: Град       Персонаж          Кариера    Фирма                         Обект            Общество      VIP   	[Телефонен указател] [Търсене]  [Форум]   [Помощ]                  [Изход] 
  *  56: Miestas    Veikėjas          Karjera    Kompanija     CEO             Vieta            Bendruomenė   VIP   	[Telefonų knyga]     [Paieška]  [Forumas] [Pagalba]                [Atsijungti]
  *  66: Ciutat     Personatge        Carrera    Empresa                       Ubicació         Comunitat     VIP   	[Agenda]             [Cerca]    [Fòrum]   [Ajuda]                  [Desconnecta]
  */ 	
@@ -173,12 +172,11 @@ var pm_PopoLang = {
 		'\u015eehir': 19,   // tr
 		'Ora\u015f': 23,    // ro
 		//'City': 24->2,    // en-GB
-		'Grad': 32,         // sr, hr, bs
+		'Grad': 32,         // sr, hr
 		//'Grad': 32,       // sr
 		'V\u00e1ros': 33,   // hu
 		'Linn': 36,         // et
 		//'Grad': 39->32,   // hr
-		'\u0413\u0440\u0430\u0434': 43, // bg
 		//'Cidade': 50->11, // pt-BR
 		//'Ciudad': 51->6,  // es-AR
 		'Miestas': 56,      // lt
@@ -201,35 +199,32 @@ var pm_PopoLang = {
 				case 2: // en-US
 					if (langId == 24) { // en-GB
 						this.detectedLangId = langId;
-					};
+					}
 					break;
 				case 6: // es
 					if (langId == 51) { // es-AR
 						this.detectedLangId = langId;
-					};
+					}
 					break;
 				case 7: // nb
 					if (langId == 8) { // da
 						this.detectedLangId = langId;
-					};
+					}
 					break;
 				case 11: // pt
 					if (langId == 50) { // pt-BR
 						this.detectedLangId = langId;
-					};
+					}
 					break;
 				case 15: // zh-SG
 					if (langId == 106) { // zh-CN
 						this.detectedLangId = langId;
-					};
+					}
 					break;
 				case 32: // sr
 					if (langId == 39) { // hr
 						this.detectedLangId = langId;
 					}
-					else if (langId == 58) { // bs
-						this.detectedLangId = langId;
-					};
 					break;
 			}
 

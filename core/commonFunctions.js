@@ -1,6 +1,6 @@
-/*
+/**
  * commonFunctions.js 
- * Copyright © 2007 Tommi Rautava
+ * Copyright (C) 2007-2009  Tommi Rautava
  * 
  * This file is part of Popomungo.
  *
@@ -24,64 +24,85 @@
 
 function pm_InsertRowAfter(key, value, hover, afterRow) {
 	var doc = afterRow.ownerDocument;
-	var newRow = doc.createElement('tr');
-	var newData1 = doc.createElement('td');
-	var newData2 = doc.createElement('td');
 
-	// FIXME Replace innerHTML manipulation.
-	newData1.innerHTML = '<b class="popomungo_added">'+ key +':</b>';
+	var b1 = doc.createElement('b');
+	b1.className = 'popomungo_added';
+	b1.appendChild(doc.createTextNode(key));
+
+	var td1 = doc.createElement('td');
+	td1.appendChild(b1);
+
+	var span2 = doc.createElement('span');
+	span2.className = 'popomungo_added';
+	span2.appendChild(doc.createTextNode(value));
+	
 	if (hover) {
-		newData2.innerHTML = '<span class="popomungo_added" title="'+ 
-			hover +'">'+ value +'</span>';
-	} else {
-		newData2.innerHTML = '<span class="popomungo_added">'+ 
-			value +'</span>';
+		span2.setAttribute('title', hover);
 	}
 
-	newRow.appendChild(newData1);
-	newRow.appendChild(newData2);
+	var td2 = doc.createElement('td');
+	td2.appendChild(span2);
 
-	afterRow.parentNode.insertBefore(newRow, afterRow.nextSibling);
+	var tr1 = doc.createElement('tr');
+	tr1.appendChild(td1);
+	tr1.appendChild(td2);
 
-	return newRow;
+	afterRow.parentNode.insertBefore(tr1, afterRow.nextSibling);
+
+	return tr1;
 };
 
-///////////////////////////////////////////////////////////////////////
-function pm_CreateTableRow(doc, arg) {
-	var tr = doc.createElement('tr');
-	
-	pm_Logger.debug('arg='+ arg);
-	
-	if (arg.length) {
-		for (var i=0; i<arg.length; i++) {
-			var td = doc.createElement('td');
-			td.appendChild(arg[i]);
-			tr.appendChild(td);
-		}
-	} else {
-		var td = doc.createElement('td');
-		td.appendChild(arg);
-		tr.appendChild(td);
-	}	
 
-	return tr;
-};
-
-///////////////////////////////////////////////////////////////////////
-function pm_CreateAnchor(doc, href, arg) {
-	var anchor = doc.createElement('a');
-	anchor.href = href;
-
-	if (arg.length) {
-		for (var i=0; i<arg.length; i++) {
-			anchor.appendChild(arg[i]);
-		}
-	} else {
-		anchor.appendChild(arg);
+/**
+ * This function is based on the HTML parser example that was published on 
+ * the Greasemonkey blog 4th December 2005 by boogs 
+ * (Aaron Boodman <boogs@youngpup.net>).
+ * 
+ * The blog article:
+ * http://www.greasespot.net/2005/12/workarounds-for-missing-xmlhttprequest.html
+ * 
+ * The example script:
+ * http://youngpup.net/userscripts/htmlparserexample.user.js
+ */ 
+function pm_ConvertResponseTextIntoIFrame(doc, responseText, callback) 
+{
+	try {
+		// create an IFRAME to write the document into. the iframe must be added
+		// to the document and rendered (eg display != none) to be property 
+		// initialized.
+		var iframe = doc.createElement('iframe');
+		iframe.style.visibility = 'hidden';
+		iframe.style.position = 'absolute';
+		iframe.id = 'popomungo_iframe';
+		doc.body.appendChild(iframe);
+		
+		// give it a URL so that it will create a .contentDocument property. Make
+		// the URL be the current page's URL so that we can communicate with it.
+		// Otherwise, same-origin policy would prevent us.
+		iframe.contentWindow.location.href = doc.location.href;
+		
+		// write the received content into the document
+		iframe.contentDocument.open('text/html');
+		iframe.contentDocument.write(responseText);
+		
+		iframe.contentDocument.addEventListener(
+			'DOMContentLoaded', 
+			function() {
+				callback(iframe.contentDocument);
+				iframe.parentNode.removeChild(iframe);
+			},
+			false
+		);
+		
+		iframe.contentDocument.close();
 	}
-
-	return anchor;
+	catch (err) {
+		pm_Logger.logError(err);
+	}
+	
+	return true;
 };
+
 
 ///////////////////////////////////////////////////////////////////////
 function pm_Trim(s) {
