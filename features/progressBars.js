@@ -68,6 +68,7 @@ pm_ProgressBarsClass.prototype = {
 	addTextOverStats: function addTextOverStats(aDocument, aTitleRegexp) {
 		try {
 			if (!pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_SHOW_PROGRESSBAR_VALUES)) {
+                pm_Logger.debug("Text on ProgressBar is DISABLED. " + pm_PrefKeys.PROGRESSBARS_SHOW_PROGRESSBAR_VALUES);
 				return;
 			}
 
@@ -120,6 +121,7 @@ pm_ProgressBarsClass.prototype = {
 			var addSoldTicketsPercent = pm_Prefs.isEnabled(pm_PrefKeys.PROGRESSBARS_ADD_SOLD_TICKETS_PERCENTAGE);
 
 			if (!(addSoldTickets || addSoldTicketsPercent)) {
+                pm_Logger.debug("Text on Ticket Sales Bar is DISABLED. " + pm_PrefKeys.PROGRESSBARS_ADD_SOLD_TICKETS_COUNT + " " + pm_PrefKeys.PROGRESSBARS_ADD_SOLD_TICKETS_PERCENTAGE);            
 				return;
 			}
 	

@@ -14,7 +14,7 @@ function init()
     fillDictionary(false);    
     chrome.self.onConnect.addListener(onPortConnect);    
     
-    scheduleRequest();
+    //scheduleRequest();
 }
 
 function scheduleRequest() 
@@ -30,7 +30,8 @@ function refreshPreferences()
 
 function fillDictionary(doSendPrefs)
 {
-    cm_UserPreferences = cm_SaveLib.getNameValueCollection();
+    cm_UserPreferences = {};
+    cm_UserPreferences = getNameValueCollection();
     cm_CanSendSettings = true;
     if ( doSendPrefs == true )
     {
@@ -40,7 +41,7 @@ function fillDictionary(doSendPrefs)
 
 function setValue(sKey, oValue)
 {
-    cm_SaveLib.saveData(sKey, oValue);
+    saveData(sKey, oValue);
 }
 
 function onPortConnect(port) 
@@ -71,6 +72,16 @@ function onMessageReceived(data)
         
         setValue(sKey, sValue);
     }
+    else if ( data.message == "OptionsSaved!" )
+    {
+        fillDictionary(true);
+    }
+    else if ( data.message == "ZapSettings!" )
+    {
+        clearData();
+        cm_UserPreferences = {};
+        sendPreferences();
+    }  
 }
 
 function sendPreferences()
