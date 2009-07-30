@@ -63,11 +63,6 @@ pm_OverlayClass.prototype = {
 			var path1 = aDocument.location.pathname;
 			var query1 = aDocument.location.search;
 
-			pm_Logger.debug("Request #"+ this.requestCount
-				+"\nhref="+ aDocument.location.href +
-				"\npath="+ path1 +
-				"\nquery="+ query1);
-
 			// Remove frames
 			if (path1 == '/common/index.html' && 
 				pm_Logger.getTraceLevel()) 
@@ -103,12 +98,7 @@ pm_OverlayClass.prototype = {
 				action2 = result[1].toLowerCase();
 			}
 
-			pm_Logger.debug("Request #"+ this.requestCount +
-				"\npage="+ page +
-				"\naction="+ action +
-				"\naction2="+ action2);
-
-			var processScoreNumbersEnabled = true;
+            var processScoreNumbersEnabled = true;
 			var processLinksEnabled = true;
 	
 			if (page == undefined) {
@@ -155,16 +145,12 @@ pm_OverlayClass.prototype = {
 				
 				var langId = pm_UserSettings.autoDetectLanguageFromPage(aDocument);
 				
-				pm_Strings.InitStringBundle(langId);
-				
-				pm_Logger.debug(timer1.elapsedTimeStr());
+				pm_Strings.InitStringBundle(langId);							
 
 				pm_Logger.debug("Pre-tasks");
 
 				pm_Styles.appendCSS(aDocument);
 		
-				pm_Logger.debug(timer1.elapsedTimeStr());
-
 				pm_Logger.debug("Main-tasks");
 
 				if (page == 'city') {
@@ -172,7 +158,6 @@ pm_OverlayClass.prototype = {
 						action == undefined) 
 					{
 						pm_Locales.addLocaleIcons(aDocument);
-						pm_Logger.debug(timer1.elapsedTimeStr());
 
 						//pm_UserSettings.updateSettingsFromCityPage(aDocument);
 						//pm_Traveling.addRouteInfoOnCityPage(aDocument);						
@@ -180,7 +165,6 @@ pm_OverlayClass.prototype = {
 						// Too many links here, we will need to use another methods.
 						processScoreNumbersEnabled = false;
 						pm_Scoring.addNumericScoresOnCityPage(aDocument);
-						pm_Logger.debug(timer1.elapsedTimeStr());
 
 						processLinksEnabled = false;
 						pm_Links.addEventHandlerOnCityPage(aDocument);
@@ -406,28 +390,22 @@ pm_OverlayClass.prototype = {
 				// CharacterDiary/view
 				// CharacterBlog/ReadBlog CreateBlogEntry
 
-				pm_Logger.debug(timer1.elapsedTimeStr());
-
 				pm_Logger.debug("Post-tasks");
 
 				pm_Bookmarks.showBookmarks(aDocument);
-				pm_Logger.debug(timer1.elapsedTimeStr());
 
 				if (processScoreNumbersEnabled) {
 					pm_Scoring.addNumericScores(aDocument);
-					pm_Logger.debug(timer1.elapsedTimeStr());
 				}
 			
 				if (processLinksEnabled) {
 					pm_Links.processLinks(aDocument);
-					pm_Logger.debug(timer1.elapsedTimeStr());
 				}
 			}
 			else {
 				pm_Logger.debug("Character ID is not available.");
 			}
 			
-			pm_Logger.debug(timer1.elapsedTimeStr());
 			pm_Logger.debug('Request #'+ this.requestCount + ' completed.');
 		}
 		catch (err)

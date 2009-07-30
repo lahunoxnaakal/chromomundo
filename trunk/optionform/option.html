@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="it" lang="it">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chromomungo - Opzioni</title>
+	<style type="text/css">
+	body{
+		font:75%/150% "Trebuchet MS", "Lucida Grande", "Bitstream Vera Sans", Arial, Helvetica, sans-serif;
+		color:#666666;
+		margin:60px;
+	}
+	</style>    
+    <script type="text/javascript" src="../core/savelib.js"></script>    
+    <script type="text/javascript" src="prettyForms.js"></script>
+    <link rel="stylesheet" href="prettyForms.css" type="text/css" media="screen" />
+    <script type="text/javascript">
+
+var dict = {};
+
+function init()
+{    
+    loadSettings();
+    prettyForms();
+}
+
+function loadSettings()
+{
+    var checks=document.getElementsByTagName('input');
+    for ( var i = 0; i < checks.length; ++i )
+    {
+        if ( checks[i].type == 'checkbox' )
+        {
+            var checked = loadData(checks[i].value);
+            if ( checked == "true" )
+                checks[i].checked = 'checked';
+        }
+        else if ( checks[i].type == 'radio' ) 
+        {
+            var value = loadData(checks[i].name);
+            if ( value == checks[i].value )
+            {
+                checks[i].checked = 'checked';
+            }
+        }
+    }
+}
+
+var port = 0;
+
+function saveSetting(key, value)
+{
+    if ( port != 0 )
+    {
+        port.postMessage({message: "SetPref!", values: [key, value]});
+    }
+}
+
+function saveSettings()
+{
+    port = chrome.extension.connect(); 
+
+    var checks=document.getElementsByTagName('input');
+    for ( var i = 0; i < checks.length; ++i )
+    {
+        if ( checks[i].type == 'checkbox' )
+        {
+            saveSetting(checks[i].value, checks[i].checked ? 'true' : 'false');
+        }
+        else if ( checks[i].type == 'radio' ) 
+        {
+            if ( checks[i].checked )
+            {
+                saveSetting(checks[i].name, checks[i].value);
+            }
+        }        
+    }
+    
+    /* DEFAULTS */
+	saveSetting('settings.autoDetectCityName.enabled', 'true');
+	saveSetting('settings.autoDetectDateAndTimeFormat.enabled', 'true');
+	saveSetting('settings.autoDetectLanguage.enabled', 'true');
+    saveSetting('settings.links.visible.type', '2');
+
+    showText = document.getElementById("signalEvent");
+    //showText.innerHTML = "Dati salvati, attendi qualche secondo e poi aggiorna la pagina di Popmundo.";
+    showText.innerHTML = document.cookie;
+    
+       
+    port.postMessage({message: "OptionsSaved!", values: ""});
+    port.disconnect();    
+}
+
+function zapSettings()
+{    
+    var port = chrome.extension.connect();    
+    port.postMessage({message: "ZapSettings!", values: ""}); 
+    port.disconnect();
+    
+    showText = document.getElementById("signalEvent");
+    //showText.innerHTML = "Dati azzerati, attendi qualche secondo e poi aggiorna la pagina di Popmundo.";        
+    showText.innerHTML = document.cookie;
+}
+
+</script>
+</head>
+<body onLoad="init();">
+<form name="options" action="" onsubmit="return(saveSettings());">
+<p>
+    <input type="checkbox" name="checks" value="enabled"/>
+    <label class="longlabel"> Abilita Chromomungo</label>
+    <br/>
+</p>
+<div> 
+ <p> 
+     <input type="checkbox" name="checks" value="settings.progressBars.showProgressBarValues"/>
+     <label class="longlabel">Visualizza i valori sopra le barre di avanzamento</label>
+     <br/>
+ </p>
+    <p>
+        <fieldset>
+            <legend>Dimensioni del font</legend>
+            <input type="radio" name="settings.progressBars.font.size" value="8"/><label class="shortlabel">Piccolissimo</label>
+            <input type="radio" name="settings.progressBars.font.size" value="9"/><label class="shortlabel">Piccolo</label>
+            <input type="radio" name="settings.progressBars.font.size" value="10" checked="checked"/><label class="shortlabel">Medio</label>
+            <input type="radio" name="settings.progressBars.font.size" value="11"/><label class="shortlabel">Grande</label>
+            <input type="radio" name="settings.progressBars.font.size" value="12"/><label class="shortlabel">Grandissimo</label>
+        </fieldset>
+        <fieldset>
+            <legend>Forza del font</legend>
+            <input type="radio" name="settings.progressBars.font.weight" value="normal"/><label class="shortlabel">Normale</label>
+            <input type="radio" name="settings.progressBars.font.weight" value="bold"/><label class="shortlabel">Grassetto</label>
+        </fieldset> 
+    </p>
+</div>
+<div>
+    <p>
+        <input type="checkbox" name="checks" value="settings.scoring.addScoreNumber.enabled"/> 
+        <label class="longlabel">Aggiungi punteggi numerici alle Caratteristiche</label>
+        <br/>
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.scoring.colorNumber.enabled"/> 
+        <label class="longlabel">Colora i numeri del punteggio</label>
+        <br/>      
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.scoring.disableLink.enabled"/> 
+        <label class="longlabel">Disabilita il collegamento alla tabella del punteggio</label>
+        <br/>   
+    </p>    
+     <fieldset>
+     <legend>Inizia il punteggio da</legend>
+       <input type="radio" name="settings.scoring.scoreBase" value="0"/><label class=shortlabel">0</label>
+       <input type="radio" name="settings.scoring.scoreBase" value="1"/><label class=shortlabel">1</label>
+     </fieldset>
+     <br/>
+     <fieldset>
+     <legend>Tema di colori</legend>
+       <input type="radio" name="settings.scoring.colorNumber.colorType" value="0"/><label class=shortlabel">Arcobaleno</label>
+       <input type="radio" name="settings.scoring.colorNumber.colorType" value="1"/><label class=shortlabel">Gradiente</label>
+     </fieldset>        
+</div>
+<div>
+    <p>
+        <input type="checkbox" name="checks" value="settings.locales.icons.enabled"/> 
+        <label class="longlabel">Abilita Icone dei Locali</label>
+        <br/>   
+    </p> 
+    <p>
+        <input type="checkbox" name="checks" value="settings.links.popup.locale.enabled"/> 
+        <label class="longlabel">Abilita men&ugrave; a tendina dei Locali</label>
+        <br/>   
+        <fieldset>
+            <legend>Menu a tendina</legend>
+            <input type="checkbox" name="checks" value="settings.links.popup.locale.moveHere.enabled"/>
+            <label class=shortlabel">Sposta Qui</label>
+            <input type="checkbox" name="checks" value="settings.links.popup.locale.viewCharacters.enabled"/>
+            <label class=shortlabel">Visualizza Personaggi</label>
+        </fieldset>        
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.links.visible.locale.enabled"/> 
+        <label class="longlabel">Abilita collegamenti visibili dei Locali</label>
+        <br/>   
+        <fieldset>
+            <legend>Collegamenti visibili</legend>
+            <input type="checkbox" name="checks" value="settings.links.visible.locale.moveHere.enabled"/>
+            <label class=shortlabel">Sposta Qui</label>
+            <input type="checkbox" name="checks" value="settings.links.visible.locale.viewCharacters.enabled"/>
+            <label class=shortlabel">Visualizza Personaggi</label>
+        </fieldset>        
+    </p>      
+    <p>
+        <input type="checkbox" name="checks" value="settings.links.popup.character.enabled"/> 
+        <label class="longlabel">Abilita men&ugrave; a tendina dei Personaggi</label>
+        <br/>   
+        <fieldset>
+            <legend>Menu a tendina</legend>
+            <input type="checkbox" name="checks" value="settings.links.popup.character.call.enabled"/>
+            <label class=shortlabel">Chiama</label>
+            <input type="checkbox" name="checks" value="settings.links.popup.character.sendMessage.enabled"/>
+            <label class=shortlabel">Invia Messaggio</label>
+        </fieldset>        
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.links.visible.character.enabled"/> 
+        <label class="longlabel">Abilita collegamenti visibili dei Personaggi</label>
+        <br/>   
+        <fieldset>
+            <legend>Collegamenti visibili</legend>
+            <input type="checkbox" name="checks" value="settings.links.visible.character.call.enabled"/>
+            <label class=shortlabel">Chiama</label>
+            <input type="checkbox" name="checks" value="settings.links.visible.character.sendMessage.enabled"/>
+            <label class=shortlabel">Invia Messaggio</label>
+        </fieldset>        
+    </p>         
+</div>
+
+<p><input type="button" value="Salva e Applica" onClick="saveSettings()"/></p>
+<p><input type="button" value="Reimposta" onClick="zapSettings()"/></p>
+</form>
+<div id="signalEvent" style="margin:120px 0; font-weight:bold; color:#970C3B;">&nbsp;</div>
+</body>
+</html>

@@ -112,10 +112,12 @@ var pm_Locales = {
 	addLocaleIcons: function addLocaleIcons(aDocument) {
 		try {
 			if (!pm_Prefs.isEnabled(pm_PrefKeys.LOCALES_IMAGES_ENABLED)) {
+                pm_Logger.debug("Locale Icons are DISABLED. " + pm_PrefKeys.LOCALES_IMAGES_ENABLED);
 				return;
 			}
 			
 			if (!pm_Charts.PrepareLocales()) {
+                pm_Logger.debug("PrepareLocales FAILED.");
 				return;				
 			}
 
