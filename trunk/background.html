@@ -14,7 +14,7 @@ function init()
     fillDictionary(false);    
     chrome.self.onConnect.addListener(onPortConnect);    
     
-    //scheduleRequest();
+    setDefaults();
 }
 
 function scheduleRequest() 
@@ -74,6 +74,7 @@ function onMessageReceived(data)
     }
     else if ( data.message == "OptionsSaved!" )
     {
+        //checkLocaleIconParameters();
         fillDictionary(true);
     }
     else if ( data.message == "ZapSettings!" )
@@ -90,6 +91,125 @@ function sendPreferences()
     {        
         cm_Port.postMessage({message: "Hello!", values: cm_UserPreferences});        
     }
+}
+
+
+/**
+ *  1 Club
+ *  2 Airport
+ *  3 Park
+ *  5 Hospital
+ *  6 Record Studio
+ *  8 Jam place
+ * 10 City Hall
+ * 11 Gym
+ * 20 Generic Shop
+ * 22 Grave Yard
+ * 23 Prison
+ * 25 School
+ * 26 Bank
+ * 27 Construction Company
+ * 29 Factory
+ * 30 Artist Agency
+ * 31 Law firm
+ * 32 Hotel
+ * 34 Pet Shop
+ * 36 Security firm
+ * 37 Police Station
+ * 38 Bus Terminal
+ * 39 Car Dealer
+ * 41 Stage Equipment Shop
+ * 42 Travel Route
+ * 45 Music Instrument Shop
+ * 46 Second Hand Store
+ * 47 Plastic Surgery Center
+ * 49 Countryside
+ * 50 Restaurant
+ * 52 Tattoo Parlor
+ * 53 TV Station
+ * 58 Water Reservoire
+ * 59 Day nursery
+ * 60 Temple
+ * 63 Fire Station
+ * 65 Court House
+ * 66 Head Office
+ */
+
+function checkLocaleIconParameters()
+{
+    var a_local_pref_key = 'settings.locales.icon.1.url';
+    var a_local_icon = loadData(a_local_pref_key, undefined);
+    
+    //chrome.extension.getURL("skin/icons/silk/door_in.png")
+    
+    if ( a_local_icon == undefined )
+    {
+        setValue('settings.locales.icon.1.url', "skin/icons/silk/music.png"); 
+        setValue('settings.locales.icon.2.url', "skin/icons/silk/airport.png");
+        setValue('settings.locales.icon.3.url', "skin/icons/silk/park.png");
+        setValue('settings.locales.icon.5.url', "skin/icons/silk/hospital.png");
+        setValue('settings.locales.icon.6.url', "skin/icons/silk/cd.png");
+        setValue('settings.locales.icon.8.url', "skin/icons/silk/music.png");
+        
+        setValue('settings.locales.icon.10.url', "skin/icons/silk/city_hall.png");
+        setValue('settings.locales.icon.11.url', "skin/icons/silk/gym.png");
+        
+        setValue('settings.locales.icon.20.url', "skin/icons/silk/cart.png");
+        setValue('settings.locales.icon.22.url', "skin/icons/silk/grave_yard.png");
+        setValue('settings.locales.icon.23.url', "skin/icons/silk/lock.png");
+        setValue('settings.locales.icon.25.url', "skin/icons/silk/book_open.png");
+        setValue('settings.locales.icon.26.url', "skin/icons/silk/money.png");
+        setValue('settings.locales.icon.27.url', "skin/icons/silk/wrench_orange.png");
+        setValue('settings.locales.icon.29.url', "skin/icons/silk/wrench.png");
+        
+        setValue('settings.locales.icon.30.url', "skin/icons/silk/star.png");
+        setValue('settings.locales.icon.31.url', "skin/icons/silk/law.png");
+        setValue('settings.locales.icon.32.url', "skin/icons/silk/building.png");
+        setValue('settings.locales.icon.34.url', "skin/icons/silk/tux.png");
+        setValue('settings.locales.icon.35.url', "skin/icons/silk/airport.png");
+        setValue('settings.locales.icon.36.url', "skin/icons/silk/shield.png");
+        setValue('settings.locales.icon.37.url', "skin/icons/silk/shield.png");
+        setValue('settings.locales.icon.38.url', "skin/icons/silk/bus_terminal.png");
+        setValue('settings.locales.icon.39.url', "skin/icons/silk/car.png");
+        
+        setValue('settings.locales.icon.41.url', "skin/icons/silk/sound.png");
+        setValue('settings.locales.icon.42.url', "skin/icons/silk/autoroad.png");
+        setValue('settings.locales.icon.45.url', "skin/icons/silk/music_cart.png");
+        setValue('settings.locales.icon.46.url', "skin/icons/silk/basket.png");
+        setValue('settings.locales.icon.47.url', "skin/icons/silk/clinic.png");
+        setValue('settings.locales.icon.49.url', "skin/icons/silk/offroad.png");
+        
+        setValue('settings.locales.icon.50.url', "skin/icons/silk/drink.png");
+        setValue('settings.locales.icon.52.url', "skin/icons/silk/anchor.png");
+        setValue('settings.locales.icon.53.url', "skin/icons/silk/television.png");
+        setValue('settings.locales.icon.56.url', "skin/icons/silk/thq.png");
+        setValue('settings.locales.icon.57.url', "skin/icons/silk/lightning.png");
+        setValue('settings.locales.icon.58.url', "skin/icons/silk/water_reservoire.png");
+        setValue('settings.locales.icon.59.url', "skin/icons/silk/emoticon_smile.png");
+        
+        setValue('settings.locales.icon.60.url', "skin/icons/silk/house.png");
+        setValue('settings.locales.icon.61.url', "skin/icons/silk/lightbulb.png");
+        setValue('settings.locales.icon.63.url', "skin/icons/silk/bell.png");
+        setValue('settings.locales.icon.64.url', "skin/icons/silk/tube.png");
+        setValue('settings.locales.icon.65.url', "skin/icons/silk/court_house.png");
+        setValue('settings.locales.icon.66.url', "skin/icons/silk/head_office.png");
+        setValue('settings.locales.icon.67.url', "skin/icons/silk/bin.png");
+        
+        setValue('settings.locales.icon.83.url', "skin/icons/silk/weapons.png");
+        setValue('settings.locales.icon.84.url', "skin/icons/silk/grocery.png");
+        setValue('settings.locales.icon.85.url', "skin/icons/silk/parking.png");
+        setValue('settings.locales.icon.86.url', "skin/icons/silk/psyco.png");
+        setValue('settings.locales.icon.88.url', "skin/icons/silk/university.png");
+    }
+}
+
+function setDefaults()
+{
+    /* DEFAULTS */
+	setValue('settings.autoDetectCityName.enabled', 'true');
+	setValue('settings.autoDetectDateAndTimeFormat.enabled', 'true');
+	setValue('settings.autoDetectLanguage.enabled', 'true');
+    setValue('settings.links.visible.type', '2');
 }
 
 </script>

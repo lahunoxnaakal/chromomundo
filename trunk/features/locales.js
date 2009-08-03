@@ -58,8 +58,13 @@
  * 65 Court House
  * 66 Head Office
  */
-var pm_Locales = {
 
+function pm_LocalesClass() {
+	// void
+}
+
+pm_LocalesClass.prototype = {
+	//LOCALE_MENUS_XPATH: '/html/body/table[last()]/tbody/tr/td[1]/table/tbody/tr/td/a',
 	LOCALE_MENUS_XPATH: '/html/body/table[last()]/tbody/tr/td[1]/table/tbody',
 	
 	LOCALE_TYPE_AND_QUALITY_REGEXP: /^(.*?): (.*)/i,
@@ -149,7 +154,7 @@ var pm_Locales = {
 				{
 					pm_Logger.debug("Adding locale icons to menu="+ menuName);
 					
-					var anchorNodes = aDocument.getAnchorNodesOnMenu(menuName, menuNode);
+					var anchorNodes = pm_ElementCache.getAnchorNodesOnMenu(menuName, menuNode);
 					var ignoreMissing = {};
 					
 					for (var j = anchorNodes.length - 1; j > -1; j--) {
@@ -157,7 +162,7 @@ var pm_Locales = {
 						
 						if (!anchorNode.hasAttribute('onclick')) {						
 							var localeInfo = pm_Locales.parseLocaleInfoFromLink(anchorNode);
-			
+                            pm_Logger.debug("LocaleInfo=" + localeInfo);
 							if (localeInfo) {
 								if (localeInfo.localeTypeId) {
 									var imgUrl = pm_Locales.getLocaleIcon(localeInfo.localeTypeId);
@@ -232,8 +237,9 @@ var pm_Locales = {
 			
 			if (imgUrl == undefined) {
 				var pref = pm_PrefKeys.GetLocaleIconUrlPrefKey(localeTypeId);
-				
-				imgUrl = pm_Prefs.getPref(pref, "");
+				var img = pm_LocaleIcons[pref];
+                
+				imgUrl = chrome.extension.getURL(img);
 				
 				this.localeTypeIdToImage[localeTypeId] = imgUrl;
 			}
@@ -247,3 +253,7 @@ var pm_Locales = {
 		return "";
 	}
 };
+
+var pm_Locales = new pm_LocalesClass();
+
+// EOF

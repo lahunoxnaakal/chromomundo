@@ -18,7 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var pm_Links = {
+function pm_LinksClass() {
+	// void
+}
+
+pm_LinksClass.prototype = {
 	VISIBLE_TEXT_LINK: 1,
 	VISIBLE_ICON_LINK: 2,
 
@@ -445,7 +449,7 @@ var pm_Links = {
 				{
 					pm_Logger.debug('Adding visible links to menu='+ menuName);
 					
-					var anchorNodes = aDocument.getAnchorNodesOnMenu(menuName, menuNode);
+					var anchorNodes = pm_ElementCache.getAnchorNodesOnMenu(menuName, menuNode);
 
 					for (var j = anchorNodes.length - 1; j > -1; j--)
 					{
@@ -489,3 +493,7 @@ var pm_Links = {
 		return null;
 	}
 };
+
+var pm_Links = new pm_LinksClass();
+
+// EOF

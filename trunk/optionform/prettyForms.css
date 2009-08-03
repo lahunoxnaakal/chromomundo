@@ -32,6 +32,10 @@ legend{
     font-weight:bold
 }
 
+div#menu {
+    border: 1px dotted #ccc
+}
+
 .longlabel{
     width:400px;
 }
