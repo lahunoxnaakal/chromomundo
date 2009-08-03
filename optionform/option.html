@@ -104,9 +104,12 @@ function zapSettings()
 <form name="options" action="" onsubmit="return(saveSettings());">
 <p>
     <input type="checkbox" name="checks" value="enabled"/>
-    <label class="longlabel"> Abilita Chromomungo</label>
+    <label class="longlabel">Abilita Chromomungo</label>
     <br/>
 </p>
+
+<hr/>
+<h3>Barre di Avanzamento</h3>
 <div id='menu'> 
  <p> 
      <input type="checkbox" name="checks" value="settings.progressBars.showProgressBarValues"/>
@@ -129,6 +132,9 @@ function zapSettings()
         </fieldset> 
     </p>
 </div>
+
+<hr/>
+<h3>Punteggi</h3>
 <div id='menu'>
     <p>
         <input type="checkbox" name="checks" value="settings.scoring.addScoreNumber.enabled"/> 
@@ -157,6 +163,9 @@ function zapSettings()
        <input type="radio" name="settings.scoring.colorNumber.colorType" value="1"/><label class=shortlabel">Gradiente</label>
      </fieldset>        
 </div>
+
+<hr/>
+<h3>Scorciatoie</h3>
 <div id='menu'>
     <p>
         <input type="checkbox" name="checks" value="settings.locales.icons.enabled"/> 
@@ -213,6 +222,63 @@ function zapSettings()
     </p>         
 </div>
 
+<hr/>
+<h3>Concerti</h3>
+<div id='menu'>
+    <p>
+        <input type="checkbox" name="checks" value="settings.performances.showNumberOfSoldTicketsPerShow.enabled"/> 
+        <label class="longlabel">Visualizza il numero di biglietti venduti per spettacolo</label>
+        <br/>
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.performances.showTotalNumberOfSoldTickets.enabled"/> 
+        <label class="longlabel">Visualizza totale dei biglietti venduti</label>
+        <br/>      
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.performances.showTotalNumberOfShows.enabled"/> 
+        <label class="longlabel">Visualizza conteggio spettacoli</label>
+        <br/>   
+    </p>    
+</div>
+
+<hr/>
+<h3>Concerti Passati</h3>
+<div id='menu'>
+    <p>
+        <input type="checkbox" name="checks" value="settings.performances.ticketSalesStatistics.enabled"/> 
+        <label class="longlabel">Aggiungi le statistiche di vendita dei biglietti</label>
+        <br/>
+    </p>
+</div>
+
+<hr/>
+<h3>Concerti Futuri</h3>
+<div id='menu'>
+    <p>
+        <input type="checkbox" name="checks" value="settings.progressBars.shows.addSoldTicketsProgressBar"/> 
+        <label class="longlabel">Visualizza barra di avanzamento per i biglietti venduti</label>
+        <br/>
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.performances.ticketSalesEstimates.enabled"/> 
+        <label class="longlabel">Aggiungi i ricavi di vendita dei biglietti</label>
+        <br/>      
+    </p>
+    <p>
+        <input type="checkbox" name="checks" value="settings.performances.useColorsOnUpcomingShows.enabled"/> 
+        <label class="longlabel">Usa i colori per l'elenco degli eventi programmati</label>
+        <br/>   
+    </p>  
+    <p>
+        <input type="checkbox" name="checks" value="settings.highlighting.highlightLowTicketLimit.enabled"/> 
+        <label class="longlabel">Avvisa in caso di raggiungimento limite biglietti</label>
+        <br/>  
+    </p>      
+</div>
+
+
+<hr/>
 <p><input type="button" value="Salva e Applica" onClick="saveSettings()"/></p>
 <p><input type="button" value="Reimposta" onClick="zapSettings()"/></p>
 </form>

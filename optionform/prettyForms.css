@@ -11,29 +11,27 @@ input, textarea, select{
 	padding:0px 3px;
 	font:90%/180% "Trebuchet MS", "Lucida Grande", "Bitstream Vera Sans", Arial, Helvetica, sans-serif;
 	color:#666666;
-
 }
 
 label{
 	float:left;
-	margin:5px;
-	
+	margin:5px;	
 	display:block;
 }
 
 fieldset{
     float:center;
-	margin:5px;
+	margin:15px;
 	width:400px;
 	display:block;
 }
 
 legend{
-    font-weight:bold
+    font-weight:bold;
 }
 
-div#menu {
-    border: 1px dotted #ccc
+div#menu {    
+    margin: 25px 25px 25px 25px; 
 }
 
 .longlabel{
