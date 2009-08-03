@@ -2,6 +2,16 @@
 #labels Featured,Phase-Support,Phase-Implementation
 
 = What's New =
+=== 1.0.0 ===
+{{{
+* Brand new preference system with Option page included!
+* Again, No localization yet :(
+* Code merged with beta version of popomungo. ( 1.6b1 )
+* Lots of fix
+* Works with latest version of Google Chrome
+}}}
+
+= What's New =
 === 0.9.61 ===
 {{{
 * Finally, a preference system. Now you can set your preferences using bookmarks :)
