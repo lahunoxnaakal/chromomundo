@@ -69,8 +69,7 @@ var pm_Prefs = {
             return this.dict[aPrefName];
         }
         else
-        {
-			this.setPref(aPrefName, aDefaultValue);
+        {			
             return aDefaultValue;
         }
 	},

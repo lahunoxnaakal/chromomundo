@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="prettyForms.css" type="text/css" media="screen" />
     <script type="text/javascript">
 
-var dict = {};
-
+//var dict = {}    
+    
 function init()
 {    
     loadSettings();
@@ -49,10 +49,13 @@ var port = 0;
 
 function saveSetting(key, value)
 {
+    saveData(key, value);
+        
     if ( port != 0 )
-    {
+    {        
         port.postMessage({message: "SetPref!", values: [key, value]});
     }
+    //dict[key] = value;
 }
 
 function saveSettings()
@@ -74,13 +77,7 @@ function saveSettings()
             }
         }        
     }
-    
-    /* DEFAULTS */
-	saveSetting('settings.autoDetectCityName.enabled', 'true');
-	saveSetting('settings.autoDetectDateAndTimeFormat.enabled', 'true');
-	saveSetting('settings.autoDetectLanguage.enabled', 'true');
-    saveSetting('settings.links.visible.type', '2');
-
+        
     showText = document.getElementById("signalEvent");
     //showText.innerHTML = "Dati salvati, attendi qualche secondo e poi aggiorna la pagina di Popmundo.";
     showText.innerHTML = document.cookie;
@@ -110,7 +107,7 @@ function zapSettings()
     <label class="longlabel"> Abilita Chromomungo</label>
     <br/>
 </p>
-<div> 
+<div id='menu'> 
  <p> 
      <input type="checkbox" name="checks" value="settings.progressBars.showProgressBarValues"/>
      <label class="longlabel">Visualizza i valori sopra le barre di avanzamento</label>
@@ -132,7 +129,7 @@ function zapSettings()
         </fieldset> 
     </p>
 </div>
-<div>
+<div id='menu'>
     <p>
         <input type="checkbox" name="checks" value="settings.scoring.addScoreNumber.enabled"/> 
         <label class="longlabel">Aggiungi punteggi numerici alle Caratteristiche</label>
@@ -160,7 +157,7 @@ function zapSettings()
        <input type="radio" name="settings.scoring.colorNumber.colorType" value="1"/><label class=shortlabel">Gradiente</label>
      </fieldset>        
 </div>
-<div>
+<div id='menu'>
     <p>
         <input type="checkbox" name="checks" value="settings.locales.icons.enabled"/> 
         <label class="longlabel">Abilita Icone dei Locali</label>

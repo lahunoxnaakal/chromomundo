@@ -30,7 +30,7 @@ var pm_Logger = {
 	 */
 	log: function log(message) {	
 		console.log(
-			'Popomungo: ' + message);
+			'Chromomungo: ' + message);
 	},
 
 	/*
@@ -41,7 +41,7 @@ var pm_Logger = {
 	logError: function logError(message) {
 	
 		var myCaller = this.logError.caller.name;
-		var msg = 'Popomungo: (' +myCaller + ') '+ message;
+		var msg = 'Chromomungo: (' +myCaller + ') '+ message;
 
 		// Is exception?				
 		if (message.stack) {
@@ -61,9 +61,29 @@ var pm_Logger = {
 		if (pm_Logger.traceLevel > 0) {
 
             console.log(
-				'Popomungo: ' + message);
+				'Chromomungo: ' + message);
 		}
 	},
+    
+	debugObject: function debugObject(obj, objName) {
+		if (pm_Logger.traceLevel > 0) {
+			var myCaller = this.debugObject.caller.name;
+
+			var message = '';
+			if (obj) {
+				for (var i in obj) {
+					message = message + i +'='+ obj[i] +'\n';
+				}
+				
+				message = '\n'+ message;
+			} else {
+				message = obj;
+			}
+				
+			console.log(
+				'Chromomungo:'+ myCaller +': '+ (objName ? objName +'=' : '') + message);
+		}
+	},    
 	
 	getTraceLevel:
 	function getTraceLevel() {

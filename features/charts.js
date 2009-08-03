@@ -44,32 +44,29 @@ var pm_Charts = {
 
 			this.localesLangId = langId;
 			this.localeTypeIdToTypeName = {};
-			this.localeTypeNameToTypeId = {};
-			
-			var bundle = pm_Strings.getBundleByLanguage(langId, this.LOCALES_STRINGS_PROPS_FILE);
-			
-			if (bundle) {
-				var iter = bundle.getSimpleEnumeration();
-				
-				// Create a table for reverse mapping
-				while (iter.hasMoreElements()) {
-					var prop = iter.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
-					
-					// key = locale.<n>
-					var typeId = parseInt(prop.key.substring(7));
-					var typeName = prop.value;
-					
-					this.localeTypeIdToTypeName[typeId] = typeName; 
-					this.localeTypeNameToTypeId[typeName] = typeId;
-					
-					pm_Logger.debug(typeId +"="+ typeName);
-				}
-				
-				return true;
+			this.localeTypeNameToTypeId = {};					
+                            
+            
+            // Create a table for reverse mapping
+            for ( var i = 0; i < pm_LocaleNames.length; ++i )
+            {                
+                var item = pm_LocaleNames[i];
+                // key = locale.<n>
+                if ( item != undefined )
+                {
+                    console.log(item);
+                    
+                    var typeId = item.id;
+                    var typeName = item.name;
+                    
+                    this.localeTypeIdToTypeName[typeId] = typeName; 
+                    this.localeTypeNameToTypeId[typeName] = typeId;
+                    
+                    pm_Logger.debug(typeId +"="+ typeName);     
+                }                
 			}
-			else {
-				pm_Logger.logError("String bundle not available");
-			}
+            
+            return true;
 		}
 		catch (err) {
 			pm_Logger.logError(err);

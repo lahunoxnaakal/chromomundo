@@ -1,6 +1,6 @@
 {
   "name": "Chromomungo",
-  "version": "0.9.172",
+  "version": "0.9.207",
   "description": "The infamous Popomundo ported to Chromium Extension System.",
   "background_page": "background.html",
   "toolstrips": [
@@ -21,6 +21,8 @@
         "constants/stringKeys.js",                        
         "constants/prefKeys.js",        
         "constants/timeZones.js",
+        "constants/localeIcons.js",
+        "constants/localeNames.js",
         "core/prefs.js",
         "core/logger.js",
         "core/color.js",
